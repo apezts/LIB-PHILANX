@@ -1,71 +1,27 @@
-# LIB-PHILANX UI Library
+# LIB-PHILANX API Documentation
 
-A lightweight and customizable Roblox UI Library.
-
-> Current version: **1.3.0**
-
-## Overview
-
-LIB-PHILANX is a custom UI library designed with a simple API and reusable UI components.
-
-The library currently supports:
-
-- Window
-- Tabs
-- Tab Icons
-- Sections
-- Buttons
-- Toggles
-- Sliders
-- Dropdowns
-- Text Input
-- Labels
-- Paragraphs
-- Dividers
-- Status Boxes
-- Notifications
-- Notification Stack
-- Window visibility controls
-- Window title/subtitle controls
-
-Global Keybind is intentionally not included.
+Complete API reference for LIB-PHILANX UI Library.
 
 ---
 
-# Installation
+## Getting Started
 
-The main library is located at:
-
-`src/UILibrary.lua`
-
-For executor-based testing, the library can be loaded from the raw GitHub file using a loader.
-
-The loader should point to:
-
-`src/UILibrary.lua`
-
----
-
-# Basic Usage
-
-The general API structure is:
+Load the library first:
 
 ```lua
-local UILibrary = ...
-
-local Window = UILibrary:CreateWindow({
-    Title = "LIB-PHILANX",
-    Subtitle = "My UI"
-})
-
-local Tab = Window:CreateTab({
-    Name = "Player"
-})
-
-local Section = Tab:CreateSection("Testing")
+local UILibrary = loadstring(game:HttpGet(
+    "YOUR_GITHUB_RAW_URL"
+))()
 ```
 
-Components are then created inside a Section.
+Create a window:
+
+```lua
+local Window = UILibrary:CreateWindow({
+    Title = "LIB-PHILANX",
+    Subtitle = "My Script"
+})
+```
 
 ---
 
@@ -73,72 +29,289 @@ Components are then created inside a Section.
 
 ## CreateWindow
 
-Creates the main UI window.
+Creates the main LIB-PHILANX window.
+
+### Syntax
 
 ```lua
-local Window = UILibrary:CreateWindow({
-    Title = "LIB-PHILANX",
-    Subtitle = "My UI",
-    Size = UDim2.fromOffset(650, 450)
-})
+UILibrary:CreateWindow(options)
 ```
 
 ### Parameters
 
-| Parameter | Type | Description |
-|---|---|---|
-| Title | string | Window title |
-| Subtitle | string | Window subtitle |
-| Size | UDim2 | Window size |
+| Parameter | Type | Required | Description |
+|---|---|---|---|
+| `Title` | string | No | Window title |
+| `Subtitle` | string | No | Window subtitle |
+| `Logo` | string/number | No | Window logo asset |
+| `Size` | UDim2 | No | Window size |
+
+### Example
+
+```lua
+local Window = UILibrary:CreateWindow({
+    Title = "My Script",
+    Subtitle = "LIB-PHILANX",
+    Logo = 132859114380485,
+    Size = UDim2.fromOffset(650, 450)
+})
+```
+
+---
+
+## Window:SetTitle()
+
+Changes the window title.
+
+### Syntax
+
+```lua
+Window:SetTitle("New Title")
+```
+
+### Example
+
+```lua
+Window:SetTitle("My New Script")
+```
+
+---
+
+## Window:SetSubtitle()
+
+Changes the window subtitle.
+
+### Syntax
+
+```lua
+Window:SetSubtitle("New Subtitle")
+```
+
+### Example
+
+```lua
+Window:SetSubtitle("Updated successfully")
+```
+
+---
+
+## Window:SetLogo()
+
+Changes the window logo.
+
+The logo is updated on both the expanded window and the floating pill.
+
+### Syntax
+
+```lua
+Window:SetLogo(assetId)
+```
+
+### Example
+
+```lua
+Window:SetLogo(132859114380485)
+```
+
+You can also provide an asset string:
+
+```lua
+Window:SetLogo("rbxassetid://132859114380485")
+```
+
+---
+
+## Window:GetLogo()
+
+Returns the current logo asset.
+
+### Syntax
+
+```lua
+local Logo = Window:GetLogo()
+```
+
+### Example
+
+```lua
+print(Window:GetLogo())
+```
 
 ---
 
 # Tabs
 
-## CreateTab
+## Window:CreateTab()
 
-Creates a tab inside the window.
+Creates a new tab.
 
-```lua
-local Tab = Window:CreateTab({
-    Name = "Player"
-})
-```
-
-### Tab Icon
+### Syntax
 
 ```lua
 local Tab = Window:CreateTab({
     Name = "Player",
-    Icon = "👤"
+    Icon = "..."
 })
 ```
 
-`Icon` is optional.
+### Parameters
+
+| Parameter | Type | Required | Description |
+|---|---|---|---|
+| `Name` | string | No | Tab name |
+| `Icon` | string | No | Tab icon |
+
+### Example
+
+```lua
+local PlayerTab = Window:CreateTab({
+    Name = "Player"
+})
+```
 
 ---
 
 # Sections
 
-## CreateSection
+## Tab:CreateSection()
 
 Creates a section inside a tab.
+
+### Syntax
 
 ```lua
 local Section = Tab:CreateSection("Player Settings")
 ```
 
-Components can be placed inside the section.
+### Example
+
+```lua
+local Section = PlayerTab:CreateSection("Movement")
+```
 
 ---
 
 # Components
 
-## Button
+All components are created through a section.
+
+```lua
+Section:CreateLabel(...)
+Section:CreateParagraph(...)
+Section:CreateDivider(...)
+Section:CreateStatusBox(...)
+Section:CreateButton(...)
+Section:CreateToggle(...)
+Section:CreateInput(...)
+Section:CreateDropdown(...)
+Section:CreateKeybind(...)
+Section:CreateSlider(...)
+```
+
+---
+
+# Label
+
+## Section:CreateLabel()
+
+Creates a simple text label.
+
+### Syntax
+
+```lua
+local Label = Section:CreateLabel("Hello World")
+```
+
+### Example
+
+```lua
+Section:CreateLabel("Welcome to LIB-PHILANX")
+```
+
+---
+
+# Paragraph
+
+## Section:CreateParagraph()
+
+Creates a paragraph/information block.
+
+### Syntax
+
+```lua
+local Paragraph = Section:CreateParagraph({
+    Title = "Information",
+    Content = "This is an information message."
+})
+```
+
+### Example
+
+```lua
+Section:CreateParagraph({
+    Title = "About",
+    Content = "This script uses LIB-PHILANX."
+})
+```
+
+---
+
+# Divider
+
+## Section:CreateDivider()
+
+Creates a visual divider between components.
+
+### Syntax
+
+```lua
+Section:CreateDivider()
+```
+
+### Example
 
 ```lua
 Section:CreateButton({
-    Name = "Test Button",
+    Name = "Button"
+})
+
+Section:CreateDivider()
+
+Section:CreateToggle({
+    Name = "Toggle"
+})
+```
+
+---
+
+# StatusBox
+
+## Section:CreateStatusBox()
+
+Creates a status/information box.
+
+### Syntax
+
+```lua
+local Status = Section:CreateStatusBox({
+    Title = "Status",
+    Content = "Ready"
+})
+```
+
+---
+
+# Button
+
+## Section:CreateButton()
+
+Creates a clickable button.
+
+### Syntax
+
+```lua
+local Button = Section:CreateButton({
+    Name = "Test",
 
     Callback = function()
         print("Button clicked")
@@ -146,24 +319,45 @@ Section:CreateButton({
 })
 ```
 
-### Parameters
+### API
 
-| Parameter | Type | Description |
-|---|---|---|
-| Name | string | Button text |
-| Callback | function | Function called when clicked |
+```lua
+Button:SetTitle("New Title")
+Button:GetTitle()
+Button:SetVisible(true)
+Button:IsVisible()
+```
+
+### Example
+
+```lua
+local Button = Section:CreateButton({
+    Name = "Execute",
+    Callback = function()
+        print("Executed")
+    end
+})
+
+Button:SetTitle("Run Script")
+```
 
 ---
 
-## Toggle
+# Toggle
+
+## Section:CreateToggle()
+
+Creates an on/off toggle.
+
+### Syntax
 
 ```lua
 local Toggle = Section:CreateToggle({
-    Name = "Test Toggle",
+    Name = "Auto Farm",
     Default = false,
 
     Callback = function(value)
-        print("Toggle:", value)
+        print("Enabled:", value)
     end
 })
 ```
@@ -172,24 +366,42 @@ local Toggle = Section:CreateToggle({
 
 ```lua
 Toggle:Set(true)
-Toggle:Set(false)
+Toggle:Get()
+Toggle:SetTitle("Auto Farm")
+Toggle:SetVisible(true)
+```
 
-local value = Toggle:Get()
+### Example
+
+```lua
+local Toggle = Section:CreateToggle({
+    Name = "Auto Farm",
+    Default = false,
+
+    Callback = function(enabled)
+        print("Auto Farm:", enabled)
+    end
+})
+
+Toggle:Set(true)
 ```
 
 ---
 
-## Slider
+# Input
+
+## Section:CreateInput()
+
+Creates a text input.
+
+### Syntax
 
 ```lua
-local Slider = Section:CreateSlider({
-    Name = "WalkSpeed",
-    Min = 0,
-    Max = 100,
-    Default = 16,
+local Input = Section:CreateInput({
+    Name = "Username",
 
     Callback = function(value)
-        print("Slider:", value)
+        print("Input:", value)
     end
 })
 ```
@@ -197,26 +409,47 @@ local Slider = Section:CreateSlider({
 ### API
 
 ```lua
-Slider:Set(50)
+Input:SetValue("Player123")
+Input:GetValue()
+Input:Clear()
+Input:SetVisible(true)
+```
 
-local value = Slider:Get()
+### Example
+
+```lua
+local Input = Section:CreateInput({
+    Name = "Username"
+})
+
+Input:SetValue("Player123")
+
+print(Input:GetValue())
+
+Input:Clear()
 ```
 
 ---
 
-## Dropdown
+# Dropdown
+
+## Section:CreateDropdown()
+
+Creates a dropdown selection.
+
+### Syntax
 
 ```lua
 local Dropdown = Section:CreateDropdown({
-    Name = "Mode",
+    Name = "Select Mode",
 
     Values = {
+        "Easy",
         "Normal",
-        "Testing",
-        "Debug"
+        "Hard"
     },
 
-    Default = "Normal",
+    Default = "Easy",
 
     Callback = function(value)
         print("Selected:", value)
@@ -227,232 +460,266 @@ local Dropdown = Section:CreateDropdown({
 ### API
 
 ```lua
-Dropdown:Set("Debug")
+Dropdown:SetValue("Hard")
+Dropdown:GetValue()
+Dropdown:SetVisible(true)
+```
 
-local value = Dropdown:Get()
+### Example
+
+```lua
+local Dropdown = Section:CreateDropdown({
+    Name = "Difficulty",
+
+    Values = {
+        "Easy",
+        "Normal",
+        "Hard"
+    },
+
+    Default = "Normal"
+})
+
+Dropdown:SetValue("Hard")
+
+print(Dropdown:GetValue())
 ```
 
 ---
 
-## Input
+# Keybind
+
+## Section:CreateKeybind()
+
+Creates a keybind component.
+
+### Syntax
 
 ```lua
-Section:CreateInput({
-    Placeholder = "Enter text...",
+local Keybind = Section:CreateKeybind({
+    Name = "Toggle UI",
+    Default = Enum.KeyCode.RightShift,
 
-    Callback = function(text, enterPressed)
-        print(text)
-        print(enterPressed)
+    Callback = function()
+        print("Keybind pressed")
+    end
+})
+```
+
+### Example
+
+```lua
+Section:CreateKeybind({
+    Name = "Test Key",
+    Default = Enum.KeyCode.F,
+
+    Callback = function()
+        print("F pressed")
     end
 })
 ```
 
 ---
 
-# Label
+# Slider
 
-Creates simple text.
+## Section:CreateSlider()
+
+Creates a numeric slider.
+
+### Syntax
 
 ```lua
-Section:CreateLabel("This is a label.")
+local Slider = Section:CreateSlider({
+    Name = "WalkSpeed",
+    Min = 0,
+    Max = 100,
+    Default = 16,
+
+    Callback = function(value)
+        print("Value:", value)
+    end
+})
+```
+
+### API
+
+```lua
+Slider:SetValue(50)
+Slider:GetValue()
+Slider:SetVisible(true)
+```
+
+### Example
+
+```lua
+local Slider = Section:CreateSlider({
+    Name = "WalkSpeed",
+    Min = 16,
+    Max = 100,
+    Default = 16,
+
+    Callback = function(value)
+        print("WalkSpeed:", value)
+    end
+})
+
+Slider:SetValue(50)
+
+print(Slider:GetValue())
 ```
 
 ---
 
-# Paragraph
-
-Creates an information box.
+# Complete Example
 
 ```lua
-local Paragraph = Section:CreateParagraph({
+local UILibrary = loadstring(game:HttpGet(
+    "YOUR_GITHUB_RAW_URL"
+))()
+
+local Window = UILibrary:CreateWindow({
+    Title = "LIB-PHILANX",
+    Subtitle = "Example Script",
+    Logo = 132859114380485
+})
+
+local PlayerTab = Window:CreateTab({
+    Name = "Player"
+})
+
+local Movement = PlayerTab:CreateSection("Movement")
+
+Movement:CreateLabel("Player Controls")
+
+Movement:CreateParagraph({
     Title = "Information",
-    Content = "This is an example paragraph."
+    Content = "Configure your player settings here."
+})
+
+local Speed = Movement:CreateSlider({
+    Name = "WalkSpeed",
+    Min = 16,
+    Max = 100,
+    Default = 16,
+
+    Callback = function(value)
+        print("Speed:", value)
+    end
+})
+
+local AutoFarm = Movement:CreateToggle({
+    Name = "Auto Farm",
+    Default = false,
+
+    Callback = function(enabled)
+        print("Auto Farm:", enabled)
+    end
+})
+
+local Mode = Movement:CreateDropdown({
+    Name = "Mode",
+
+    Values = {
+        "Easy",
+        "Normal",
+        "Hard"
+    },
+
+    Default = "Normal",
+
+    Callback = function(value)
+        print("Mode:", value)
+    end
+})
+
+local TestButton = Movement:CreateButton({
+    Name = "Test",
+
+    Callback = function()
+        print("Test clicked")
+    end
+})
+
+Speed:SetValue(25)
+AutoFarm:Set(false)
+Mode:SetValue("Hard")
+TestButton:SetTitle("Execute")
+```
+
+---
+
+# Component API Pattern
+
+LIB-PHILANX uses a component-object pattern.
+
+When creating a component:
+
+```lua
+local Component = Section:CreateButton({
+    Name = "Test"
 })
 ```
 
-### API
+the returned object can be used to control that component later.
+
+For example:
 
 ```lua
-Paragraph:SetTitle("New Title")
-Paragraph:SetContent("New content")
+Component:SetVisible(false)
+```
 
-Paragraph:Set("New content")
+This allows scripts to modify the UI at runtime without recreating the component.
+
+---
+
+# Visibility Control
+
+Components that expose `SetVisible()` can be shown or hidden dynamically.
+
+```lua
+Button:SetVisible(false)
+```
+
+Show it again:
+
+```lua
+Button:SetVisible(true)
+```
+
+Check visibility:
+
+```lua
+local visible = Button:IsVisible()
 ```
 
 ---
 
-# Divider
+# Runtime Updates
 
-Creates a horizontal divider.
-
-```lua
-Section:CreateDivider()
-```
-
----
-
-# Status Box
-
-Creates an information box with a status type.
-
-Supported types:
-
-- `info`
-- `success`
-- `warning`
-- `error`
+Component values can be modified after creation.
 
 Example:
 
 ```lua
-local Status = Section:CreateStatusBox({
-    Type = "success",
-    Title = "Success",
-    Content = "Operation completed."
+local Toggle = Section:CreateToggle({
+    Name = "Auto Farm",
+    Default = false
 })
+
+Toggle:Set(true)
+
+print(Toggle:Get())
 ```
 
-### API
-
-```lua
-Status:SetTitle("New Title")
-Status:SetContent("New content")
-Status:SetType("warning")
-```
+This makes it possible to build dynamic interfaces where one component controls another.
 
 ---
 
-# Notifications
+# Notes
 
-Creates a notification.
-
-```lua
-Window:Notify({
-    Title = "Success",
-    Content = "Operation completed.",
-    Duration = 3
-})
-```
-
-Multiple notifications can be displayed at the same time.
-
-### Custom notification color
-
-```lua
-Window:Notify({
-    Title = "Warning",
-    Content = "Be careful.",
-    Duration = 3,
-    Color = Color3.fromRGB(255, 190, 70)
-})
-```
-
----
-
-# Window Controls
-
-## SetVisible
-
-Shows or hides the entire UI.
-
-```lua
-Window:SetVisible(true)
-Window:SetVisible(false)
-```
-
-## Toggle
-
-Toggles the UI visibility.
-
-```lua
-Window:Toggle()
-```
-
-## IsVisible
-
-Returns the current visibility state.
-
-```lua
-local visible = Window:IsVisible()
-print(visible)
-```
-
-## Destroy
-
-Removes the UI.
-
-```lua
-Window:Destroy()
-```
-
----
-
-# Window Title
-
-Change the title after the window has been created.
-
-```lua
-Window:SetTitle("New Title")
-```
-
-Get the current title:
-
-```lua
-local title = Window:GetTitle()
-```
-
----
-
-# Window Subtitle
-
-Change the subtitle:
-
-```lua
-Window:SetSubtitle("New Subtitle")
-```
-
-Get the current subtitle:
-
-```lua
-local subtitle = Window:GetSubtitle()
-```
-
----
-
-# Versioning
-
-LIB-PHILANX follows version numbers in the format:
-
-`MAJOR.MINOR.PATCH`
-
-Example:
-
-- `1.0.0` — Initial library
-- `1.1.0` — Keybind and window controls
-- `1.2.0` — Notification improvements and tab icons
-- `1.3.0` — Additional UI components and window title APIs
-
-Future releases should preserve existing APIs whenever possible.
-
----
-
-# Roadmap
-
-Planned improvements may include:
-
-- Better responsive layout
-- More UI components
-- Improved theme system
-- Runtime theme changes
-- Better cleanup management
-- More documentation
-- Performance improvements
-- Accessibility improvements
-
-Features that are not needed will not be added just for the sake of increasing the version number.
-
----
-
-# License
-
-License information will be added separately when the project license is finalized.
+- `Logo` can be provided as a numeric asset ID or an `rbxassetid://` string where supported.
+- Callback functions are used to react to component interaction.
+- Component API methods are intended for runtime UI manipulation.
+- Keep references to components if you need to modify them later.
+- Replace `YOUR_GITHUB_RAW_URL` with the actual raw URL of the LIB-PHILANX library.
