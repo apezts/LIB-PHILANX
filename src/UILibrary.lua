@@ -1,5 +1,5 @@
 -- LIB-PHILANX UI Library
--- Version: 1.5.1
+-- Version: 1.5.2
 -- Original Roblox UI Library
 -- For Roblox Studio / testing your own game
 
@@ -513,7 +513,7 @@ function UILibrary:CreateWindow(options)
             ScrollBarImageColor3 = Theme.Accent,
             ScrollBarImageTransparency = 0.15,
             CanvasSize = UDim2.new(),
-            AutomaticCanvasSize = Enum.AutomaticSize.Y,
+            AutomaticCanvasSize = Enum.AutomaticSize.None,
             ScrollingDirection = Enum.ScrollingDirection.Y,
             ScrollingEnabled = true,
             Active = true,
@@ -528,6 +528,16 @@ function UILibrary:CreateWindow(options)
             SortOrder = Enum.SortOrder.LayoutOrder,
             Padding = UDim.new(0, 10)
         })
+
+        local function UpdatePageCanvas()
+            Page.CanvasSize = UDim2.fromOffset(
+                0,
+                Layout.AbsoluteContentSize.Y + 20
+            )
+        end
+
+        Layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(UpdatePageCanvas)
+        task.defer(UpdatePageCanvas)
 
         table.insert(pages, {
             Button = TabButton,
@@ -574,7 +584,8 @@ function UILibrary:CreateWindow(options)
                 Parent = Page,
                 Size = UDim2.new(1, 0, 0, 55),
                 BackgroundColor3 = Theme.Secondary,
-                BorderSizePixel = 0
+                BorderSizePixel = 0,
+                ClipsDescendants = true
             })
 
             Corner(Section, 7)
@@ -694,6 +705,12 @@ function UILibrary:CreateWindow(options)
                 Theme.Secondary,
                 Color3.fromRGB(20, 55, 95)
             )
+
+            task.defer(function()
+                if not collapsed then
+                    UpdateSectionSize(false)
+                end
+            end)
 
             function SectionAPI:CreateLabel(text)
                 local Label = New("TextLabel", {
