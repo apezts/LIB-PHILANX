@@ -1,5 +1,5 @@
 -- Apez UI Library
--- Version: 1.4.0
+-- Version: 1.4.1
 -- Original Roblox UI Library
 -- For Roblox Studio / testing your own game
 
@@ -342,6 +342,24 @@ function UILibrary:CreateWindow(options)
         Color3.fromRGB(85, 35, 55)
     )
 
+    local function AddHover(button, normalColor, hoverColor)
+        if not button or not button:IsA("GuiButton") then
+            return
+        end
+
+        button.MouseEnter:Connect(function()
+            Tween(button, {
+                BackgroundColor3 = hoverColor
+            }, 0.12)
+        end)
+
+        button.MouseLeave:Connect(function()
+            Tween(button, {
+                BackgroundColor3 = normalColor
+            }, 0.12)
+        end)
+    end
+
     local pages = {}
     local Window = {}
 
@@ -461,6 +479,12 @@ function UILibrary:CreateWindow(options)
                 TextXAlignment = Enum.TextXAlignment.Left
             })
         end
+
+        AddHover(
+            TabButton,
+            Theme.Secondary,
+            Color3.fromRGB(20, 55, 95)
+        )
 
         local Page = New("ScrollingFrame", {
             Parent = Content,
