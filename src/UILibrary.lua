@@ -1,5 +1,5 @@
 -- Apez UI Library
--- Version: 1.4.1
+-- Version: 1.4.2
 -- Original Roblox UI Library
 -- For Roblox Studio / testing your own game
 
@@ -357,6 +357,24 @@ function UILibrary:CreateWindow(options)
             Tween(button, {
                 BackgroundColor3 = normalColor
             }, 0.12)
+        end)
+    end
+
+    local function AddPressAnimation(button, normalColor, pressColor)
+        if not button or not button:IsA("GuiButton") then
+            return
+        end
+
+        button.MouseButton1Down:Connect(function()
+            Tween(button, {
+                BackgroundColor3 = pressColor
+            }, 0.08)
+        end)
+
+        button.MouseButton1Up:Connect(function()
+            Tween(button, {
+                BackgroundColor3 = normalColor
+            }, 0.08)
         end)
     end
 
@@ -811,7 +829,19 @@ function UILibrary:CreateWindow(options)
                     end
                 end)
 
-                return Button
+                AddHover(
+            Button,
+            Theme.Tertiary,
+            Color3.fromRGB(22, 58, 98)
+        )
+
+        AddPressAnimation(
+            Button,
+            Theme.Tertiary,
+            Color3.fromRGB(28, 92, 145)
+        )
+
+        return Button
             end
 
             function SectionAPI:CreateToggle(options)
