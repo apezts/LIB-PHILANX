@@ -1,204 +1,152 @@
-# LIB-PHILANX API Documentation
+# DOKUMENTASI API LIB-PHILANX
+## Versi 2.8.3
 
-Complete API reference for LIB-PHILANX UI Library.
+> Dokumen ini dibuat berdasarkan source LIB-PHILANX versi 2.8.3.
+> Dokumen ini hanya menjelaskan API yang benar-benar tersedia pada implementasi saat ini.
 
 ---
 
-## Getting Started
+## 1. Library
 
-Load the library first:
+### `UILibrary:CreateWindow(options)`
 
-```lua
-local UILibrary = loadstring(game:HttpGet(
-    "YOUR_GITHUB_RAW_URL"
-))()
-```
+Membuat jendela utama LIB-PHILANX.
 
-Create a window:
+Pilihan yang umum digunakan oleh source saat ini:
 
 ```lua
 local Window = UILibrary:CreateWindow({
-    Title = "LIB-PHILANX",
-    Subtitle = "My Script"
+    Title = "Antarmuka Saya",
+    Subtitle = "Skrip Saya",
+    Size = UDim2.fromOffset(650, 450),
+    Logo = "rbxassetid://123456789"
 })
 ```
 
----
+### `UILibrary:SetTheme(theme)`
 
-# Window
+Mengubah nilai tema yang dikenali oleh library.
 
-## CreateWindow
+Kunci tema dasar yang tersedia:
 
-Creates the main LIB-PHILANX window.
+- `Background`
+- `Secondary`
+- `Tertiary`
+- `Accent`
+- `Text`
+- `SubText`
+- `Border`
+- `Success`
+- `Warning`
+- `Error`
 
-### Syntax
-
-```lua
-UILibrary:CreateWindow(options)
-```
-
-### Parameters
-
-| Parameter | Type | Required | Description |
-|---|---|---|---|
-| `Title` | string | No | Window title |
-| `Subtitle` | string | No | Window subtitle |
-| `Logo` | string/number | No | Window logo asset |
-| `Size` | UDim2 | No | Window size |
-
-### Example
-
-```lua
-local Window = UILibrary:CreateWindow({
-    Title = "My Script",
-    Subtitle = "LIB-PHILANX",
-    Logo = 132859114380485,
-    Size = UDim2.fromOffset(650, 450)
-})
-```
+Catatan penting: implementasi saat ini hanya mengubah tabel Theme bersama. Sistem ini belum menjadi sistem perubahan tema saat berjalan yang lengkap untuk semua objek antarmuka yang sudah dibuat.
 
 ---
 
-## Window:SetTitle()
+# 2. API Jendela
 
-Changes the window title.
-
-### Syntax
+### Visibilitas
 
 ```lua
-Window:SetTitle("New Title")
+Window:SetVisible(true)
+Window:SetVisible(false)
+
+Window:Toggle()
+
+local visible = Window:IsVisible()
 ```
 
-### Example
+### Minimalkan
 
 ```lua
-Window:SetTitle("My New Script")
+Window:Minimize()
+Window:Restore()
+Window:ToggleMinimize()
+
+local minimized = Window:IsMinimized()
 ```
 
----
+Sistem minimalkan menggunakan tombol mengambang untuk memulihkan jendela.
 
-## Window:SetSubtitle()
-
-Changes the window subtitle.
-
-### Syntax
+### Hancurkan
 
 ```lua
-Window:SetSubtitle("New Subtitle")
+Window:Destroy()
 ```
 
-### Example
+Menghancurkan ScreenGui utama.
+
+### Judul / Subjudul / Logo
 
 ```lua
-Window:SetSubtitle("Updated successfully")
+Window:SetTitle("Judul Baru")
+Window:GetTitle()
+
+Window:SetSubtitle("Subjudul Baru")
+Window:GetSubtitle()
+
+Window:SetLogo("rbxassetid://123456789")
+Window:GetLogo()
 ```
 
 ---
 
-## Window:SetLogo()
+# 3. Tab
 
-Changes the window logo.
-
-The logo is updated on both the expanded window and the floating pill.
-
-### Syntax
-
-```lua
-Window:SetLogo(assetId)
-```
-
-### Example
-
-```lua
-Window:SetLogo(132859114380485)
-```
-
-You can also provide an asset string:
-
-```lua
-Window:SetLogo("rbxassetid://132859114380485")
-```
-
----
-
-## Window:GetLogo()
-
-Returns the current logo asset.
-
-### Syntax
-
-```lua
-local Logo = Window:GetLogo()
-```
-
-### Example
-
-```lua
-print(Window:GetLogo())
-```
-
----
-
-# Tabs
-
-## Window:CreateTab()
-
-Creates a new tab.
-
-### Syntax
+### `Window:CreateTab(options)`
 
 ```lua
 local Tab = Window:CreateTab({
-    Name = "Player",
-    Icon = "..."
+    Name = "Utama",
+    Icon = "★"
 })
 ```
 
-### Parameters
+Pilihan yang digunakan saat ini:
 
-| Parameter | Type | Required | Description |
-|---|---|---|---|
-| `Name` | string | No | Tab name |
-| `Icon` | string | No | Tab icon |
+- `Name`
+- `Icon`
 
-### Example
+### API Tab
+
+Tab menyediakan:
 
 ```lua
-local PlayerTab = Window:CreateTab({
-    Name = "Player"
-})
+Tab:CreateSection("Nama Bagian")
 ```
+
+Tab pertama yang dibuat akan otomatis dipilih.
 
 ---
 
-# Sections
+# 4. Bagian
 
-## Tab:CreateSection()
-
-Creates a section inside a tab.
-
-### Syntax
+### `Tab:CreateSection(name)`
 
 ```lua
-local Section = Tab:CreateSection("Player Settings")
+local Section = Tab:CreateSection("Umum")
 ```
 
-### Example
+Bagian dapat dibuka dan ditutup.
+
+### API Bagian
 
 ```lua
-local Section = PlayerTab:CreateSection("Movement")
+Section:SetCollapsed(true)
+Section:SetCollapsed(false)
+
+Section:Toggle()
+
+local collapsed = Section:IsCollapsed()
 ```
 
----
-
-# Components
-
-All components are created through a section.
+### Komponen Bagian
 
 ```lua
 Section:CreateLabel(...)
 Section:CreateParagraph(...)
-Section:CreateDivider(...)
+Section:CreateDivider()
 Section:CreateStatusBox(...)
 Section:CreateButton(...)
 Section:CreateToggle(...)
@@ -210,516 +158,671 @@ Section:CreateSlider(...)
 
 ---
 
-# Label
+# 5. Label
 
-## Section:CreateLabel()
-
-Creates a simple text label.
-
-### Syntax
+### `Section:CreateLabel(text)`
 
 ```lua
-local Label = Section:CreateLabel("Hello World")
+Section:CreateLabel("Ini adalah label")
 ```
 
-### Example
-
-```lua
-Section:CreateLabel("Welcome to LIB-PHILANX")
-```
+Mengembalikan instance `TextLabel` yang dibuat.
 
 ---
 
-# Paragraph
+# 6. Paragraf
 
-## Section:CreateParagraph()
-
-Creates a paragraph/information block.
-
-### Syntax
+### `Section:CreateParagraph(options)`
 
 ```lua
 local Paragraph = Section:CreateParagraph({
-    Title = "Information",
-    Content = "This is an information message."
+    Title = "Informasi",
+    Content = "Ini adalah paragraf informasi."
 })
 ```
 
-### Example
+API:
 
 ```lua
-Section:CreateParagraph({
-    Title = "About",
-    Content = "This script uses LIB-PHILANX."
-})
+Paragraph:SetTitle("Judul Baru")
+Paragraph:SetContent("Isi Baru")
+Paragraph:Set("Isi Baru")
 ```
 
 ---
 
-# Divider
+# 7. Pemisah
 
-## Section:CreateDivider()
-
-Creates a visual divider between components.
-
-### Syntax
+### `Section:CreateDivider()`
 
 ```lua
-Section:CreateDivider()
+local Divider = Section:CreateDivider()
 ```
 
-### Example
-
-```lua
-Section:CreateButton({
-    Name = "Button"
-})
-
-Section:CreateDivider()
-
-Section:CreateToggle({
-    Name = "Toggle"
-})
-```
+Membuat pemisah visual.
 
 ---
 
-# StatusBox
+# 8. Kotak Status
 
-## Section:CreateStatusBox()
-
-Creates a status/information box.
-
-### Syntax
+### `Section:CreateStatusBox(options)`
 
 ```lua
 local Status = Section:CreateStatusBox({
-    Title = "Status",
-    Content = "Ready"
+    Type = "success",
+    Title = "Berhasil",
+    Content = "Semuanya sudah siap."
 })
+```
+
+Jenis status yang didukung:
+
+- `info`
+- `success`
+- `warning`
+- `error`
+
+API:
+
+```lua
+Status:SetTitle("Judul Baru")
+Status:SetContent("Isi Baru")
+Status:SetType("warning")
 ```
 
 ---
 
-# Button
+# 9. Tombol
 
-## Section:CreateButton()
-
-Creates a clickable button.
-
-### Syntax
+### `Section:CreateButton(options)`
 
 ```lua
-local Button = Section:CreateButton({
-    Name = "Test",
-
+Section:CreateButton({
+    Name = "Jalankan",
     Callback = function()
-        print("Button clicked")
+        print("Berhasil dijalankan")
     end
 })
 ```
 
-### API
+Pilihan yang didukung:
 
-```lua
-Button:SetTitle("New Title")
-Button:GetTitle()
-Button:SetVisible(true)
-Button:IsVisible()
-```
+- `Name`
+- `Callback`
 
-### Example
-
-```lua
-local Button = Section:CreateButton({
-    Name = "Execute",
-    Callback = function()
-        print("Executed")
-    end
-})
-
-Button:SetTitle("Run Script")
-```
+Callback dijalankan ketika tombol diklik.
 
 ---
 
-# Toggle
+# 10. Sakelar
 
-## Section:CreateToggle()
-
-Creates an on/off toggle.
-
-### Syntax
+### `Section:CreateToggle(options)`
 
 ```lua
 local Toggle = Section:CreateToggle({
-    Name = "Auto Farm",
+    Name = "ESP",
     Default = false,
-
     Callback = function(value)
-        print("Enabled:", value)
+        print("ESP:", value)
     end
 })
 ```
 
-### API
+Pilihan yang digunakan saat ini:
+
+- `Name`
+- `Default`
+- `Callback`
+- `Id`
+- `ConfigIgnore`
+
+API:
 
 ```lua
 Toggle:Set(true)
-Toggle:Get()
-Toggle:SetTitle("Auto Farm")
+Toggle:Set(false)
+
+local value = Toggle:Get()
+
+Toggle:SetTitle("Judul Baru")
 Toggle:SetVisible(true)
+Toggle:SetVisible(false)
 ```
 
-### Example
-
-```lua
-local Toggle = Section:CreateToggle({
-    Name = "Auto Farm",
-    Default = false,
-
-    Callback = function(enabled)
-        print("Auto Farm:", enabled)
-    end
-})
-
-Toggle:Set(true)
-```
+`Set(value, false)` dapat digunakan jika callback tidak ingin dijalankan.
 
 ---
 
-# Input
+# 11. Masukan
 
-## Section:CreateInput()
-
-Creates a text input.
-
-### Syntax
+### `Section:CreateInput(options)`
 
 ```lua
 local Input = Section:CreateInput({
-    Name = "Username",
-
-    Callback = function(value)
-        print("Input:", value)
+    Name = "Nama Pemain",
+    Placeholder = "Masukkan nama...",
+    Default = "",
+    Callback = function(text, enterPressed)
+        print(text, enterPressed)
     end
 })
 ```
 
-### API
+Implementasi saat ini mengembalikan instance `TextBox` Roblox secara langsung.
 
-```lua
-Input:SetValue("Player123")
-Input:GetValue()
-Input:Clear()
-Input:SetVisible(true)
-```
+Pilihan yang digunakan saat ini:
 
-### Example
+- `Placeholder`
+- `Default`
+- `Callback`
+- `Id`
+- `ConfigIgnore`
 
-```lua
-local Input = Section:CreateInput({
-    Name = "Username"
-})
-
-Input:SetValue("Player123")
-
-print(Input:GetValue())
-
-Input:Clear()
-```
+Callback dijalankan ketika `FocusLost`.
 
 ---
 
-# Dropdown
+# 12. Daftar Pilihan
 
-## Section:CreateDropdown()
+### `Section:CreateDropdown(options)`
 
-Creates a dropdown selection.
+Implementasi saat ini mendukung mode satu pilihan dan banyak pilihan.
 
-### Syntax
+## Satu Pilihan
 
 ```lua
 local Dropdown = Section:CreateDropdown({
-    Name = "Select Mode",
-
-    Values = {
-        "Easy",
-        "Normal",
-        "Hard"
-    },
-
-    Default = "Easy",
-
+    Name = "Mode",
+    Values = {"Mudah", "Normal", "Sulit"},
+    Default = "Normal",
+    Multi = false,
+    Search = true,
     Callback = function(value)
-        print("Selected:", value)
+        print(value)
     end
 })
 ```
 
-### API
+## Banyak Pilihan
 
 ```lua
-Dropdown:SetValue("Hard")
+local Dropdown = Section:CreateDropdown({
+    Name = "Fitur",
+    Values = {"ESP", "Aimbot", "Kecepatan"},
+    Default = {"ESP", "Kecepatan"},
+    Multi = true,
+    Search = true,
+    MaxSelected = 2,
+    Callback = function(values)
+        print(values)
+    end
+})
+```
+
+Pilihan yang digunakan saat ini:
+
+- `Name`
+- `Values`
+- `Default`
+- `Multi`
+- `Search`
+- `SearchPlaceholder`
+- `MaxSelected`
+- `MaxSelectedCallback`
+- `Callback`
+- `Id`
+- `ConfigIgnore`
+
+### API Daftar Pilihan
+
+```lua
+Dropdown:Set(value, fireCallback)
+Dropdown:Get()
+
+Dropdown:SetValue(value, fireCallback)
 Dropdown:GetValue()
+
 Dropdown:SetVisible(true)
+Dropdown:SetVisible(false)
+
+Dropdown:SetTitle("Judul Baru")
+
+Dropdown:IsMulti()
 ```
 
-### Example
+Untuk Daftar Pilihan Banyak:
 
 ```lua
-local Dropdown = Section:CreateDropdown({
-    Name = "Difficulty",
+Dropdown:SelectAll(fireCallback)
+Dropdown:DeselectAll(fireCallback)
+Dropdown:ClearSelection(fireCallback)
 
-    Values = {
-        "Easy",
-        "Normal",
-        "Hard"
-    },
-
-    Default = "Normal"
-})
-
-Dropdown:SetValue("Hard")
-
-print(Dropdown:GetValue())
+Dropdown:GetMaxSelected()
+Dropdown:SetMaxSelected(limit, fireCallback)
 ```
+
+Pilihan:
+
+```lua
+Dropdown:AddOption("Pilihan Baru")
+Dropdown:RemoveOption("Pilihan Baru")
+
+Dropdown:SetValues({
+    "A",
+    "B",
+    "C"
+}, fireCallback)
+```
+
+Pencarian:
+
+```lua
+Dropdown:SetSearch("abc")
+
+local search = Dropdown:GetSearch()
+
+Dropdown:ClearSearch()
+```
+
+Penghapusan umum:
+
+```lua
+Dropdown:Clear(fireCallback)
+```
+
+### Status Pilihan
+
+Implementasi secara khusus melacak pilihan yang sedang dipilih.
+
+Pilihan yang sedang dipilih ditampilkan dengan:
+
+- teks aksen
+- tanda centang
+- garis tepi aksen
+
+Hal ini berlaku untuk mode satu pilihan dan banyak pilihan.
 
 ---
 
-# Keybind
+# 13. Tombol Pintas
 
-## Section:CreateKeybind()
-
-Creates a keybind component.
-
-### Syntax
+### `Section:CreateKeybind(options)`
 
 ```lua
 local Keybind = Section:CreateKeybind({
-    Name = "Toggle UI",
+    Name = "Sakelar Antarmuka",
     Default = Enum.KeyCode.RightShift,
 
-    Callback = function()
-        print("Keybind pressed")
+    Callback = function(key)
+        print("Pressed:", key.Name)
+    end,
+
+    Changed = function(key)
+        print("Changed:", key.Name)
     end
 })
 ```
 
-### Example
+Pilihan yang digunakan saat ini:
+
+- `Name`
+- `Default`
+- `Callback`
+- `Changed`
+- `Id`
+- `ConfigIgnore`
+
+API:
 
 ```lua
-Section:CreateKeybind({
-    Name = "Test Key",
-    Default = Enum.KeyCode.F,
-
-    Callback = function()
-        print("F pressed")
-    end
-})
+Keybind:Set(Enum.KeyCode.F)
+local key = Keybind:Get()
 ```
+
+Mengklik kontrol tombol pintas akan masuk ke mode mendengarkan dan menunggu tombol pada papan ketik.
 
 ---
 
-# Slider
+# 14. Penggeser
 
-## Section:CreateSlider()
-
-Creates a numeric slider.
-
-### Syntax
+### `Section:CreateSlider(options)`
 
 ```lua
 local Slider = Section:CreateSlider({
-    Name = "WalkSpeed",
+    Name = "Kecepatan Berjalan",
     Min = 0,
     Max = 100,
-    Default = 16,
+    Default = 50,
+    Step = 5,
+    Decimals = 0,
 
     Callback = function(value)
-        print("Value:", value)
+        print(value)
     end
 })
 ```
 
-### API
+Pilihan yang digunakan saat ini:
+
+- `Name`
+- `Min`
+- `Minimum`
+- `Max`
+- `Maximum`
+- `Default`
+- `Step`
+- `Decimals`
+- `Callback`
+- `Id`
+- `ConfigIgnore`
+
+### Slider API
 
 ```lua
-Slider:SetValue(50)
-Slider:GetValue()
+Slider:Set(value, fireCallback)
+Slider:SetValue(value, fireCallback)
+
+local value = Slider:Get()
+local value = Slider:GetValue()
+
+Slider:SetMin(minimum, fireCallback)
+Slider:SetMax(maximum, fireCallback)
+Slider:SetStep(step, fireCallback)
+Slider:SetDecimals(decimals, fireCallback)
+
+local min = Slider:GetMin()
+local max = Slider:GetMax()
+local step = Slider:GetStep()
+local decimals = Slider:GetDecimals()
+
+Slider:SetTitle("Judul Baru")
 Slider:SetVisible(true)
+Slider:SetVisible(false)
 ```
 
-### Example
+`Step` diterapkan pada nilai sebenarnya.
 
-```lua
-local Slider = Section:CreateSlider({
-    Name = "WalkSpeed",
-    Min = 16,
-    Max = 100,
-    Default = 16,
+Contoh:
 
-    Callback = function(value)
-        print("WalkSpeed:", value)
-    end
-})
+```text
+Min = 0
+Max = 100
+Step = 5
 
-Slider:SetValue(50)
-
-print(Slider:GetValue())
+0, 5, 10, 15, ... 100
 ```
 
 ---
 
-# Complete Example
+# 15. Notifikasi
+
+### `Window:Notify(options)`
 
 ```lua
-local UILibrary = loadstring(game:HttpGet(
-    "YOUR_GITHUB_RAW_URL"
-))()
-
-local Window = UILibrary:CreateWindow({
-    Title = "LIB-PHILANX",
-    Subtitle = "Example Script",
-    Logo = 132859114380485
+Window:Notify({
+    Title = "Konfigurasi Tersimpan",
+    Content = "Test1 berhasil disimpan.",
+    Duration = 3
 })
+```
 
-local PlayerTab = Window:CreateTab({
-    Name = "Player"
+Pilihan yang didukung:
+
+- `Title`
+- `Content`
+- `Duration`
+- `Color`
+
+Contoh:
+
+```lua
+Window:Notify({
+    Title = "Berhasil",
+    Content = "Operasi berhasil diselesaikan.",
+    Duration = 3,
+    Color = Color3.fromRGB(70, 215, 140)
 })
+```
 
-local Movement = PlayerTab:CreateSection("Movement")
+Notifikasi muncul dengan animasi, menampilkan bilah kemajuan durasi, kemudian menghilang secara otomatis.
 
-Movement:CreateLabel("Player Controls")
+---
 
-Movement:CreateParagraph({
-    Title = "Information",
-    Content = "Configure your player settings here."
+# 16. Pengelola Konfigurasi
+
+### `Tab:CreateConfigManager(options)`
+
+Pengelola Konfigurasi menyediakan:
+
+- pemilih konfigurasi
+- pencarian konfigurasi
+- simpan
+- muat
+- hapus
+- segarkan
+- masukan nama konfigurasi
+
+Contoh:
+
+```lua
+local ConfigUI = ConfigTab:CreateConfigManager({
+    DefaultName = "Bawaan"
 })
+```
 
-local Speed = Movement:CreateSlider({
-    Name = "WalkSpeed",
-    Min = 16,
-    Max = 100,
-    Default = 16,
+### API Pengelola Konfigurasi
 
-    Callback = function(value)
-        print("Speed:", value)
-    end
-})
+```lua
+ConfigUI:Refresh()
 
-local AutoFarm = Movement:CreateToggle({
-    Name = "Auto Farm",
-    Default = false,
+ConfigUI:Save("Utama")
+ConfigUI:Load("Utama", false)
+ConfigUI:Delete("Utama")
 
-    Callback = function(enabled)
-        print("Auto Farm:", enabled)
-    end
-})
+ConfigUI:Exists("Utama")
 
-local Mode = Movement:CreateDropdown({
-    Name = "Mode",
+local configs = ConfigUI:List()
 
-    Values = {
-        "Easy",
-        "Normal",
-        "Hard"
-    },
+ConfigUI:GetName()
+ConfigUI:SetName("Utama")
 
-    Default = "Normal",
+ConfigUI:GetSelector()
+ConfigUI:GetInput()
+```
 
-    Callback = function(value)
-        print("Mode:", value)
-    end
-})
+Informasi penyimpanan game:
 
-local TestButton = Movement:CreateButton({
-    Name = "Test",
-
-    Callback = function()
-        print("Test clicked")
-    end
-})
-
-Speed:SetValue(25)
-AutoFarm:Set(false)
-Mode:SetValue("Hard")
-TestButton:SetTitle("Execute")
+```lua
+ConfigUI:GetGameId()
+ConfigUI:GetGameName()
+ConfigUI:GetGameFolder()
+ConfigUI:GetConfigFolder()
 ```
 
 ---
 
-# Component API Pattern
+# 17. API Konfigurasi Jendela
 
-LIB-PHILANX uses a component-object pattern.
-
-When creating a component:
+Jendela juga menyediakan fungsi konfigurasi berikut:
 
 ```lua
-local Component = Section:CreateButton({
-    Name = "Test"
-})
-```
+Window:CreateConfig(name)
 
-the returned object can be used to control that component later.
+Window:RegisterConfig(id, controlType, control)
 
-For example:
+Window:SaveConfig(name)
+Window:LoadConfig(name, fireCallback)
 
-```lua
-Component:SetVisible(false)
-```
+Window:DeleteConfig(name)
+Window:ConfigExists(name)
+Window:ListConfigs()
 
-This allows scripts to modify the UI at runtime without recreating the component.
+Window:GetActiveConfig()
+Window:SetActiveConfig(name)
 
----
-
-# Visibility Control
-
-Components that expose `SetVisible()` can be shown or hidden dynamically.
-
-```lua
-Button:SetVisible(false)
-```
-
-Show it again:
-
-```lua
-Button:SetVisible(true)
-```
-
-Check visibility:
-
-```lua
-local visible = Button:IsVisible()
+Window:GetConfigValues()
+Window:GetRegisteredConfigs()
 ```
 
 ---
 
-# Runtime Updates
+# 18. Penyimpanan Konfigurasi
 
-Component values can be modified after creation.
+Struktur penyimpanan saat ini adalah:
 
-Example:
-
-```lua
-local Toggle = Section:CreateToggle({
-    Name = "Auto Farm",
-    Default = false
-})
-
-Toggle:Set(true)
-
-print(Toggle:Get())
+```text
+LIB-PHILANX/
+└── [PlaceName]_[GameId]/
+    ├── Config1.json
+    ├── Config2.json
+    └── ...
 ```
 
-This makes it possible to build dynamic interfaces where one component controls another.
+Contoh:
+
+```text
+LIB-PHILANX/
+└── Just a baseplate_9271746647/
+    ├── Test1.json
+    └── Test2.json
+```
+
+### Aturan Identitas
+
+`GameId` merupakan identitas utama.
+
+Nama tempat hanya digunakan sebagai awalan yang mudah dibaca.
+
+Sistem pencari mencari folder yang sudah ada dan diakhiri dengan:
+
+```text
+_[GameId]
+```
+
+Karena itu, awalan nama yang mudah dibaca tidak menentukan identitas konfigurasi.
 
 ---
 
-# Notes
+# 19. Serialisasi Konfigurasi
 
-- `Logo` can be provided as a numeric asset ID or an `rbxassetid://` string where supported.
-- Callback functions are used to react to component interaction.
-- Component API methods are intended for runtime UI manipulation.
-- Keep references to components if you need to modify them later.
-- Replace `YOUR_GITHUB_RAW_URL` with the actual raw URL of the LIB-PHILANX library.
+Serialisasi saat ini mendukung:
+
+- `string`
+- `number`
+- `boolean`
+- `nil`
+- `table`
+- `Color3`
+- `EnumItem`
+
+Dukungan `EnumItem` saat ini dapat mengembalikan `Enum.KeyCode`.
+
+`Color3` disimpan dalam bentuk:
+
+```lua
+{
+    __type = "Color3",
+    r = value.R,
+    g = value.G,
+    b = value.B
+}
+```
+
+---
+
+# 20. Pendaftaran Konfigurasi
+
+Komponen dapat mendaftarkan dirinya ke:
+
+```lua
+ConfigManager:Register(
+    id,
+    controlType,
+    control
+)
+```
+
+Kontrol yang didaftarkan oleh komponen bawaan akan dikumpulkan ketika penyimpanan dilakukan.
+
+`ConfigIgnore = true` membuat komponen tidak didaftarkan.
+
+---
+
+# 21. Sistem Pemuatan
+
+Library memiliki pengelola pemuatan yang melacak proses pembuatan komponen.
+
+Bobot beban kerja komponen saat ini meliputi:
+
+- Window
+- Sidebar
+- Tab
+- Section
+- Label
+- Paragraph
+- Divider
+- StatusBox
+- Button
+- Toggle
+- Input
+- Dropdown
+- Keybind
+- Slider
+
+Layar pemuatan menampilkan:
+
+- status proses
+- persentase
+- jumlah komponen yang sudah diproses
+- beban kerja
+
+Library utama tetap dinonaktifkan sampai proses pemuatan selesai.
+
+---
+
+# 22. Catatan Penyelesaian Saat Ini
+
+Source saat ini memiliki karakteristik yang sudah terkonfirmasi berikut:
+
+### Sudah selesai
+
+- jendela utama
+- tab
+- bagian
+- komponen tampilan
+- Button
+- Toggle
+- Input
+- Slider
+- daftar pilihan satu
+- daftar pilihan banyak
+- pencarian daftar pilihan
+- Keybind
+- StatusBox
+- Paragraph
+- Divider
+- Notification
+- muating screen
+- Config Manager
+- penyimpanan konfigurasi berdasarkan GameId
+
+### Tidak termasuk target fitur akhir saat ini
+
+- pemuatan otomatis
+- penyimpanan otomatis
+- penggantian nama konfigurasi
+- ekspor konfigurasi
+- impor konfigurasi
+- peningkatan baru pada daftar pilihan
+- peningkatan baru pada tombol pintas
+- peningkatan baru pada jendela
+
+### Bagian penyelesaian yang masih perlu diperiksa
+
+- pengujian regresi
+- kecocokan konfigurasi pada semua komponen yang terdaftar
+- perilaku penghancuran dan pembersihan
+- perilaku tema
+- kecocokan dengan pelaksana
+- pengujian kondisi khusus dan kesalahan
+- catatan perubahan dan versi rilis akhir
