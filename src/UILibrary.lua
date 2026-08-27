@@ -1,5 +1,5 @@
 -- Apez UI Library
--- Version: 1.4.2
+-- Version: 1.4.3
 -- Original Roblox UI Library
 -- For Roblox Studio / testing your own game
 
@@ -1061,21 +1061,53 @@ function UILibrary:CreateWindow(options)
                     end)
                 end
 
-                Button.MouseButton1Click:Connect(function()
-                    opened = not opened
-                    List.Visible = opened
+                local function CloseDropdown()
+                    opened = false
 
+                    local targetHeight = List.AbsoluteSize.Y
+
+                    Tween(Holder, {
+                        Size = UDim2.new(1, 0, 0, 40)
+                    }, 0.16)
+
+                    Tween(List, {
+                        Size = UDim2.new(1, 0, 0, 0)
+                    }, 0.16)
+
+                    task.delay(0.17, function()
+                        if not opened then
+                            List.Visible = false
+                        end
+                    end)
+                end
+
+                Button.MouseButton1Click:Connect(function()
                     if opened then
-                        RefreshSize()
-                        Holder.Size = UDim2.new(
+                        CloseDropdown()
+                        return
+                    end
+
+                    opened = true
+                    List.Visible = true
+                    RefreshSize()
+
+                    local targetHeight = List.AbsoluteSize.Y
+
+                    List.Size = UDim2.new(1, 0, 0, 0)
+                    Holder.Size = UDim2.new(1, 0, 0, 40)
+
+                    Tween(List, {
+                        Size = UDim2.new(1, 0, 0, targetHeight)
+                    }, 0.18)
+
+                    Tween(Holder, {
+                        Size = UDim2.new(
                             1,
                             0,
                             0,
-                            45 + List.AbsoluteSize.Y
+                            45 + targetHeight
                         )
-                    else
-                        Holder.Size = UDim2.new(1, 0, 0, 40)
-                    end
+                    }, 0.18)
                 end)
 
                 ListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(RefreshSize)
@@ -1218,6 +1250,8 @@ function UILibrary:CreateWindow(options)
                 })
                 Corner(Holder, 6)
 
+                local SliderHoverInstalled = true
+
                 New("TextLabel", {
                     Parent = Holder,
                     Position = UDim2.fromOffset(12, 6),
@@ -1269,7 +1303,7 @@ function UILibrary:CreateWindow(options)
                     )
 
                     value = math.floor(min + ((max - min) * percent))
-                    Fill.Size = UDim2.new(percent, 0, 1, 0)
+                    Tween(Fill, {Size = UDim2.new(percent, 0, 1, 0)}, 0.08)
                     ValueLabel.Text = tostring(value)
 
                     if options.Callback then
@@ -1311,7 +1345,7 @@ function UILibrary:CreateWindow(options)
 
                     local percent = (value - min) / (max - min)
 
-                    Fill.Size = UDim2.new(percent, 0, 1, 0)
+                    Tween(Fill, {Size = UDim2.new(percent, 0, 1, 0)}, 0.12)
                     ValueLabel.Text = tostring(value)
 
                     if options.Callback then
