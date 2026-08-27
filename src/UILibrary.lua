@@ -129,6 +129,25 @@ function UILibrary:CreateWindow(options)
 
     ScreenGui.Parent = Player:WaitForChild("PlayerGui")
 
+    local NotificationHolder = New("Frame", {
+        Name = "NotificationHolder",
+        Parent = ScreenGui,
+        AnchorPoint = Vector2.new(1, 1),
+        Position = UDim2.new(1, -20, 1, -20),
+        Size = UDim2.fromOffset(300, 0),
+        AutomaticSize = Enum.AutomaticSize.Y,
+        BackgroundTransparency = 1,
+        ZIndex = 100
+    })
+
+    local NotificationLayout = New("UIListLayout", {
+        Parent = NotificationHolder,
+        SortOrder = Enum.SortOrder.LayoutOrder,
+        VerticalAlignment = Enum.VerticalAlignment.Bottom,
+        HorizontalAlignment = Enum.HorizontalAlignment.Right,
+        Padding = UDim.new(0, 8)
+    })
+
     local Main = New("Frame", {
         Name = "Main",
         Parent = ScreenGui,
@@ -1019,7 +1038,8 @@ function UILibrary:CreateWindow(options)
             Size = UDim2.fromOffset(280, 75),
             BackgroundColor3 = Theme.Secondary,
             BorderSizePixel = 0,
-            LayoutOrder = math.floor(os.clock() * 1000)
+            LayoutOrder = math.floor(os.clock() * 1000),
+            ZIndex = 100
         })
 
         Corner(notification, 8)
@@ -1030,7 +1050,8 @@ function UILibrary:CreateWindow(options)
             Position = UDim2.fromOffset(0, 8),
             Size = UDim2.fromOffset(3, 59),
             BackgroundColor3 = accent,
-            BorderSizePixel = 0
+            BorderSizePixel = 0,
+            ZIndex = 101
         })
 
         New("TextLabel", {
@@ -1042,7 +1063,8 @@ function UILibrary:CreateWindow(options)
             TextColor3 = Theme.Text,
             Font = Enum.Font.GothamBold,
             TextSize = 13,
-            TextXAlignment = Enum.TextXAlignment.Left
+            TextXAlignment = Enum.TextXAlignment.Left,
+            ZIndex = 101
         })
 
         New("TextLabel", {
@@ -1056,7 +1078,8 @@ function UILibrary:CreateWindow(options)
             TextSize = 11,
             TextWrapped = true,
             TextXAlignment = Enum.TextXAlignment.Left,
-            TextYAlignment = Enum.TextYAlignment.Top
+            TextYAlignment = Enum.TextYAlignment.Top,
+            ZIndex = 101
         })
 
         local progress = New("Frame", {
@@ -1064,7 +1087,8 @@ function UILibrary:CreateWindow(options)
             Position = UDim2.new(0, 0, 1, -3),
             Size = UDim2.new(1, 0, 0, 3),
             BackgroundColor3 = accent,
-            BorderSizePixel = 0
+            BorderSizePixel = 0,
+            ZIndex = 101
         })
 
         notification.Position = UDim2.new(1, 320, 0, 0)
