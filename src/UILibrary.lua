@@ -1,5 +1,5 @@
 -- Apez UI Library
--- Version: 1.2.0
+-- Version: 1.3.0
 -- Original Roblox UI Library
 -- For Roblox Studio / testing your own game
 
@@ -327,6 +327,46 @@ function UILibrary:CreateWindow(options)
         end
     end
 
+    --==================================================
+    -- WINDOW TITLE API
+    --==================================================
+
+    function Window:SetTitle(newTitle)
+        local titleLabel = TopBar:FindFirstChild("TitleLabel")
+
+        if titleLabel and titleLabel:IsA("TextLabel") then
+            titleLabel.Text = tostring(newTitle)
+        end
+    end
+
+    function Window:SetSubtitle(newSubtitle)
+        local subtitleLabel = TopBar:FindFirstChild("SubtitleLabel")
+
+        if subtitleLabel and subtitleLabel:IsA("TextLabel") then
+            subtitleLabel.Text = tostring(newSubtitle)
+        end
+    end
+
+    function Window:GetTitle()
+        local titleLabel = TopBar:FindFirstChild("TitleLabel")
+
+        if titleLabel and titleLabel:IsA("TextLabel") then
+            return titleLabel.Text
+        end
+
+        return nil
+    end
+
+    function Window:GetSubtitle()
+        local subtitleLabel = TopBar:FindFirstChild("SubtitleLabel")
+
+        if subtitleLabel and subtitleLabel:IsA("TextLabel") then
+            return subtitleLabel.Text
+        end
+
+        return nil
+    end
+
     function Window:CreateTab(options)
         options = options or {}
 
@@ -504,6 +544,183 @@ function UILibrary:CreateWindow(options)
             end)
 
             local SectionAPI = {}
+
+            function SectionAPI:CreateLabel(text)
+                local Label = Create("TextLabel", {
+                    Parent = Elements,
+                    Size = UDim2.new(1, 0, 0, 28),
+                    BackgroundTransparency = 1,
+                    Text = tostring(text or ""),
+                    TextColor3 = Theme.Text,
+                    Font = Enum.Font.GothamMedium,
+                    TextSize = 12,
+                    TextWrapped = true,
+                    TextXAlignment = Enum.TextXAlignment.Left,
+                    TextYAlignment = Enum.TextYAlignment.Center
+                })
+
+                return Label
+            end
+
+            function SectionAPI:CreateParagraph(options)
+                options = options or {}
+
+                local Paragraph = Create("Frame", {
+                    Parent = Elements,
+                    Size = UDim2.new(1, 0, 0, 65),
+                    BackgroundColor3 = Theme.Tertiary,
+                    BorderSizePixel = 0
+                })
+
+                AddCorner(Paragraph, 6)
+                AddStroke(Paragraph)
+
+                Create("TextLabel", {
+                    Parent = Paragraph,
+                    Position = UDim2.fromOffset(12, 7),
+                    Size = UDim2.new(1, -24, 0, 18),
+                    BackgroundTransparency = 1,
+                    Text = options.Title or "Information",
+                    TextColor3 = Theme.Text,
+                    Font = Enum.Font.GothamBold,
+                    TextSize = 12,
+                    TextXAlignment = Enum.TextXAlignment.Left
+                })
+
+                local Content = Create("TextLabel", {
+                    Parent = Paragraph,
+                    Position = UDim2.fromOffset(12, 28),
+                    Size = UDim2.new(1, -24, 0, 30),
+                    BackgroundTransparency = 1,
+                    Text = options.Content or "",
+                    TextColor3 = Theme.SubText,
+                    Font = Enum.Font.Gotham,
+                    TextSize = 11,
+                    TextWrapped = true,
+                    TextXAlignment = Enum.TextXAlignment.Left,
+                    TextYAlignment = Enum.TextYAlignment.Top
+                })
+
+                local API = {}
+
+                function API:SetTitle(title)
+                    local titleLabel = Paragraph:FindFirstChildWhichIsA("TextLabel")
+                    if titleLabel then
+                        titleLabel.Text = tostring(title)
+                    end
+                end
+
+                function API:SetContent(content)
+                    Content.Text = tostring(content)
+                end
+
+                function API:Set(text)
+                    Content.Text = tostring(text)
+                end
+
+                return API
+            end
+
+            function SectionAPI:CreateDivider()
+                local Divider = Create("Frame", {
+                    Parent = Elements,
+                    Size = UDim2.new(1, 0, 0, 1),
+                    BackgroundColor3 = Theme.Border,
+                    BorderSizePixel = 0
+                })
+
+                return Divider
+            end
+
+            function SectionAPI:CreateStatusBox(options)
+                options = options or {}
+
+                local status = string.lower(options.Type or "info")
+
+                local statusColor = Theme.Accent
+
+                if status == "success" then
+                    statusColor = Theme.Success
+                elseif status == "warning" then
+                    statusColor = Theme.Warning
+                elseif status == "error" then
+                    statusColor = Theme.Error
+                end
+
+                local Box = Create("Frame", {
+                    Parent = Elements,
+                    Size = UDim2.new(1, 0, 0, 62),
+                    BackgroundColor3 = Theme.Tertiary,
+                    BorderSizePixel = 0
+                })
+
+                AddCorner(Box, 6)
+                AddStroke(Box, Theme.Border)
+
+                local Accent = Create("Frame", {
+                    Parent = Box,
+                    Position = UDim2.fromOffset(0, 7),
+                    Size = UDim2.fromOffset(3, 48),
+                    BackgroundColor3 = statusColor,
+                    BorderSizePixel = 0
+                })
+
+                AddCorner(Accent, 3)
+
+                local Title = Create("TextLabel", {
+                    Parent = Box,
+                    Position = UDim2.fromOffset(13, 7),
+                    Size = UDim2.new(1, -25, 0, 18),
+                    BackgroundTransparency = 1,
+                    Text = options.Title or string.upper(status),
+                    TextColor3 = statusColor,
+                    Font = Enum.Font.GothamBold,
+                    TextSize = 12,
+                    TextXAlignment = Enum.TextXAlignment.Left
+                })
+
+                local Content = Create("TextLabel", {
+                    Parent = Box,
+                    Position = UDim2.fromOffset(13, 28),
+                    Size = UDim2.new(1, -25, 0, 27),
+                    BackgroundTransparency = 1,
+                    Text = options.Content or "",
+                    TextColor3 = Theme.SubText,
+                    Font = Enum.Font.Gotham,
+                    TextSize = 11,
+                    TextWrapped = true,
+                    TextXAlignment = Enum.TextXAlignment.Left,
+                    TextYAlignment = Enum.TextYAlignment.Top
+                })
+
+                local API = {}
+
+                function API:SetTitle(title)
+                    Title.Text = tostring(title)
+                end
+
+                function API:SetContent(content)
+                    Content.Text = tostring(content)
+                end
+
+                function API:SetType(newType)
+                    local newStatus = string.lower(newType or "info")
+                    local newColor = Theme.Accent
+
+                    if newStatus == "success" then
+                        newColor = Theme.Success
+                    elseif newStatus == "warning" then
+                        newColor = Theme.Warning
+                    elseif newStatus == "error" then
+                        newColor = Theme.Error
+                    end
+
+                    Accent.BackgroundColor3 = newColor
+                    Title.TextColor3 = newColor
+                end
+
+                return API
+            end
 
             function SectionAPI:CreateButton(options)
                 options = options or {}
