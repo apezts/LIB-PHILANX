@@ -1,38 +1,55 @@
-# LIB-PHILANX UI Library
+# LIB-PHILANX
 
-Library UI Roblox yang ringan, sederhana, dan dapat dikembangkan.
+> UI Library Roblox yang ringan, sederhana, dan mudah dikembangkan.
 
-> Versi saat ini: **1.3.0**
-
-## Tentang
-
-LIB-PHILANX adalah UI Library buatan sendiri dengan API yang sederhana dan komponen UI yang dapat digunakan kembali.
-
-Fitur yang tersedia saat ini:
-
-- Window
-- Tab
-- Icon Tab
-- Section
-- Button
-- Toggle
-- Slider
-- Dropdown
-- Input
-- Label
-- Paragraph
-- Divider
-- Status Box
-- Notification
-- Notification Stack
-- Kontrol visibilitas Window
-- Kontrol Title dan Subtitle Window
-
-**Global Keybind sengaja tidak digunakan.**
+**Versi saat ini: `1.3.0`**
 
 ---
 
-# Struktur Repository
+## 📖 Tentang
+
+**LIB-PHILANX** adalah UI Library custom untuk Roblox yang dibuat dengan fokus pada:
+
+- API yang sederhana
+- Tampilan yang bersih
+- Komponen yang dapat digunakan kembali
+- Mudah dikembangkan
+- Dokumentasi yang jelas
+- Menjaga kompatibilitas API antar versi
+
+Library ini dikembangkan secara bertahap sehingga fitur yang sudah stabil sebisa mungkin tidak diubah secara sembarangan.
+
+> Global Keybind tidak digunakan dalam library ini.
+
+---
+
+## ✨ Fitur
+
+Saat ini LIB-PHILANX mendukung:
+
+- 🪟 Window
+- 📑 Tab
+- 🖼️ Tab Icon
+- 📦 Section
+- 🔘 Button
+- 🔄 Toggle
+- 🎚️ Slider
+- 📋 Dropdown
+- 📝 Input
+- 🔤 Label
+- 📄 Paragraph
+- ➖ Divider
+- ℹ️ Status Box
+- 🔔 Notification
+- 📚 Notification Stack
+- 🎨 Theme dasar
+- 👁️ Kontrol visibilitas Window
+- 🏷️ Kontrol Title dan Subtitle Window
+- 🗑️ Window Destroy API
+
+---
+
+## 📂 Struktur Repository
 
 ```text
 LIB-PHILANX/
@@ -40,111 +57,60 @@ LIB-PHILANX/
 │   └── UILibrary.lua
 ├── examples/
 │   └── Example.lua
-└── docs/
-    └── API.md
+├── docs/
+│   └── API.md
+├── README.md
+└── LICENSE
 ```
 
-File utama library berada di:
+### `src/`
+
+Berisi kode utama library.
+
+### `examples/`
+
+Berisi contoh penggunaan library.
+
+### `docs/`
+
+Berisi dokumentasi API.
+
+---
+
+## 🚀 Memulai
+
+Library utama berada di:
 
 ```text
 src/UILibrary.lua
 ```
 
+Untuk pengujian melalui loader, gunakan file raw GitHub dari repository ini.
+
+> Pastikan URL loader mengarah ke branch dan path file library yang benar.
+
 ---
 
-# Penggunaan Dasar
+## 🧩 Contoh Dasar
 
-Struktur dasar penggunaan library:
+Struktur penggunaan library:
 
 ```lua
 local UILibrary = ...
 
 local Window = UILibrary:CreateWindow({
     Title = "LIB-PHILANX",
-    Subtitle = "UI Saya"
-})
-
-local Tab = Window:CreateTab({
-    Name = "Player"
-})
-
-local Section = Tab:CreateSection("Testing")
-```
-
-Komponen UI kemudian dibuat di dalam `Section`.
-
----
-
-# Window
-
-## CreateWindow
-
-Digunakan untuk membuat Window utama.
-
-```lua
-local Window = UILibrary:CreateWindow({
-    Title = "LIB-PHILANX",
     Subtitle = "UI Saya",
     Size = UDim2.fromOffset(650, 450)
 })
-```
 
-### Parameter
-
-| Parameter | Tipe | Keterangan |
-|---|---|---|
-| `Title` | string | Judul Window |
-| `Subtitle` | string | Subjudul Window |
-| `Size` | UDim2 | Ukuran Window |
-
----
-
-# Tab
-
-## CreateTab
-
-Membuat Tab baru.
-
-```lua
-local Tab = Window:CreateTab({
-    Name = "Player"
-})
-```
-
-### Tab dengan Icon
-
-```lua
 local Tab = Window:CreateTab({
     Name = "Player",
     Icon = "👤"
 })
-```
 
-`Icon` bersifat opsional.
+local Section = Tab:CreateSection("Testing")
 
----
-
-# Section
-
-## CreateSection
-
-Membuat Section di dalam Tab.
-
-```lua
-local Section = Tab:CreateSection("Player Settings")
-```
-
-Komponen seperti Button, Toggle, Slider, dan lainnya dapat dimasukkan ke dalam Section.
-
----
-
-# Komponen
-
-## Button
-
-Membuat tombol.
-
-```lua
 Section:CreateButton({
     Name = "Test Button",
 
@@ -154,86 +120,60 @@ Section:CreateButton({
 })
 ```
 
-### Parameter
+Untuk dokumentasi API lengkap, lihat:
 
-| Parameter | Tipe | Keterangan |
-|---|---|---|
-| `Name` | string | Nama/tulisan Button |
-| `Callback` | function | Fungsi yang dijalankan saat Button ditekan |
+```text
+docs/API.md
+```
 
 ---
 
-## Toggle
+## 🧱 Komponen
 
-Membuat tombol ON/OFF.
+### Button
 
 ```lua
-local Toggle = Section:CreateToggle({
-    Name = "Test Toggle",
+Section:CreateButton({
+    Name = "Button",
+
+    Callback = function()
+        print("Klik!")
+    end
+})
+```
+
+### Toggle
+
+```lua
+Section:CreateToggle({
+    Name = "Toggle",
     Default = false,
 
     Callback = function(value)
-        print("Toggle:", value)
+        print(value)
     end
 })
 ```
 
-### API
-
-Mengubah nilai Toggle:
+### Slider
 
 ```lua
-Toggle:Set(true)
-Toggle:Set(false)
-```
-
-Mengambil nilai Toggle:
-
-```lua
-local value = Toggle:Get()
-```
-
----
-
-## Slider
-
-Membuat Slider dengan nilai minimum dan maksimum.
-
-```lua
-local Slider = Section:CreateSlider({
-    Name = "WalkSpeed",
+Section:CreateSlider({
+    Name = "Slider",
     Min = 0,
     Max = 100,
-    Default = 16,
+    Default = 50,
 
     Callback = function(value)
-        print("Nilai Slider:", value)
+        print(value)
     end
 })
 ```
 
-### API
-
-Mengubah nilai:
+### Dropdown
 
 ```lua
-Slider:Set(50)
-```
-
-Mengambil nilai:
-
-```lua
-local value = Slider:Get()
-```
-
----
-
-## Dropdown
-
-Membuat daftar pilihan.
-
-```lua
-local Dropdown = Section:CreateDropdown({
+Section:CreateDropdown({
     Name = "Mode",
 
     Values = {
@@ -245,280 +185,61 @@ local Dropdown = Section:CreateDropdown({
     Default = "Normal",
 
     Callback = function(value)
-        print("Pilihan:", value)
+        print(value)
     end
 })
 ```
 
-### API
-
-Mengubah pilihan:
-
-```lua
-Dropdown:Set("Debug")
-```
-
-Mengambil pilihan:
-
-```lua
-local value = Dropdown:Get()
-```
-
----
-
-## Input
-
-Membuat kotak input teks.
-
-```lua
-Section:CreateInput({
-    Placeholder = "Masukkan teks...",
-
-    Callback = function(text, enterPressed)
-        print("Teks:", text)
-        print("Enter:", enterPressed)
-    end
-})
-```
-
----
-
-# Label
-
-Digunakan untuk menampilkan teks sederhana.
-
-```lua
-Section:CreateLabel("Ini adalah sebuah label.")
-```
-
----
-
-# Paragraph
-
-Digunakan untuk membuat kotak informasi yang memiliki judul dan isi.
-
-```lua
-local Paragraph = Section:CreateParagraph({
-    Title = "Informasi",
-    Content = "Ini adalah contoh isi paragraph."
-})
-```
-
-### API
-
-Mengubah judul:
-
-```lua
-Paragraph:SetTitle("Judul Baru")
-```
-
-Mengubah isi:
-
-```lua
-Paragraph:SetContent("Isi baru")
-```
-
-Atau:
-
-```lua
-Paragraph:Set("Isi baru")
-```
-
----
-
-# Divider
-
-Membuat garis pemisah.
-
-```lua
-Section:CreateDivider()
-```
-
----
-
-# Status Box
-
-Membuat kotak informasi dengan status tertentu.
-
-Tipe yang tersedia:
-
-- `info`
-- `success`
-- `warning`
-- `error`
-
-### Contoh
-
-```lua
-local Status = Section:CreateStatusBox({
-    Type = "success",
-    Title = "Berhasil",
-    Content = "Operasi berhasil dilakukan."
-})
-```
-
-### API
-
-Mengubah judul:
-
-```lua
-Status:SetTitle("Judul Baru")
-```
-
-Mengubah isi:
-
-```lua
-Status:SetContent("Isi baru")
-```
-
-Mengubah tipe:
-
-```lua
-Status:SetType("warning")
-```
-
----
-
-# Notification
-
-Membuat notifikasi.
+### Notification
 
 ```lua
 Window:Notify({
     Title = "Berhasil",
-    Content = "Operasi berhasil dilakukan.",
+    Content = "Operasi berhasil.",
     Duration = 3
 })
 ```
 
-Beberapa Notification dapat ditampilkan secara bersamaan dan akan tersusun secara vertikal.
+---
 
-### Warna Notification
+## 📚 Dokumentasi
 
-Warna dapat diubah menggunakan `Color`.
+Dokumentasi API lengkap:
 
-```lua
-Window:Notify({
-    Title = "Peringatan",
-    Content = "Harap berhati-hati.",
-    Duration = 3,
-    Color = Color3.fromRGB(255, 190, 70)
-})
-```
+`docs/API.md`
+
+Dokumentasi akan diperbarui setiap kali terdapat perubahan API yang signifikan.
 
 ---
 
-# Kontrol Window
-
-## SetVisible
-
-Menampilkan atau menyembunyikan seluruh UI.
-
-```lua
-Window:SetVisible(true)
-Window:SetVisible(false)
-```
-
----
-
-## Toggle
-
-Mengubah status tampilan UI.
-
-```lua
-Window:Toggle()
-```
-
----
-
-## IsVisible
-
-Mengambil status tampilan UI.
-
-```lua
-local visible = Window:IsVisible()
-
-print(visible)
-```
-
----
-
-## Destroy
-
-Menghapus UI.
-
-```lua
-Window:Destroy()
-```
-
----
-
-# Mengubah Title
-
-Judul Window dapat diubah setelah Window dibuat.
-
-```lua
-Window:SetTitle("Judul Baru")
-```
-
-Mengambil judul saat ini:
-
-```lua
-local title = Window:GetTitle()
-
-print(title)
-```
-
----
-
-# Mengubah Subtitle
-
-Subtitle Window dapat diubah setelah Window dibuat.
-
-```lua
-Window:SetSubtitle("Subtitle Baru")
-```
-
-Mengambil subtitle saat ini:
-
-```lua
-local subtitle = Window:GetSubtitle()
-
-print(subtitle)
-```
-
----
-
-# Versioning
-
-LIB-PHILANX menggunakan format versi:
-
-```text
-MAJOR.MINOR.PATCH
-```
-
-Contoh:
-
-```text
-1.0.0
-1.1.0
-1.2.0
-1.3.0
-```
-
-Riwayat versi:
+## 🔄 Versi
 
 ### v1.0.0
+
 Versi awal library.
 
+Komponen dasar:
+
+- Window
+- Tab
+- Section
+- Button
+- Toggle
+- Slider
+- Dropdown
+- Input
+- Notification
+
 ### v1.1.0
+
 Menambahkan:
 
-- Keybind component
-- Window visibility control
-- Window destroy control
+- Keybind Component
+- Window Visibility API
+- Window Destroy API
 
 ### v1.2.0
+
 Menambahkan:
 
 - Notification Stack
@@ -527,6 +248,7 @@ Menambahkan:
 - Tab Hover Animation
 
 ### v1.3.0
+
 Menambahkan:
 
 - Label
@@ -538,23 +260,43 @@ Menambahkan:
 
 ---
 
-# Roadmap
+## 🛠️ Roadmap
 
-Fitur yang kemungkinan akan dikembangkan selanjutnya:
+Pengembangan berikutnya direncanakan mencakup:
 
-- Layout yang lebih responsif
-- Komponen UI tambahan
-- Sistem Theme yang lebih lengkap
-- Perubahan Theme secara runtime
-- Sistem cleanup yang lebih baik
-- Dokumentasi yang lebih lengkap
-- Optimasi performa
-- Peningkatan tampilan dan animasi
+- [ ] Theme System yang lebih lengkap
+- [ ] Theme dapat diubah saat runtime
+- [ ] Komponen UI tambahan
+- [ ] Layout yang lebih responsif
+- [ ] Sistem cleanup yang lebih baik
+- [ ] Optimasi performa
+- [ ] Dokumentasi API yang lebih lengkap
+- [ ] Contoh penggunaan yang lebih lengkap
 
-Fitur yang tidak diperlukan tidak akan ditambahkan hanya untuk menaikkan nomor versi.
+Roadmap dapat berubah mengikuti kebutuhan library.
 
 ---
 
-# Lisensi
+## 🤝 Kontribusi
 
-Informasi lisensi akan ditambahkan setelah lisensi proyek ditentukan.
+Jika repository ini nantinya dibuka untuk kontribusi, perubahan sebaiknya:
+
+1. Tidak merusak API yang sudah ada.
+2. Memperbaiki bug dengan perubahan seminimal mungkin.
+3. Menambahkan dokumentasi untuk API baru.
+4. Menggunakan penamaan fungsi yang konsisten.
+5. Mengikuti struktur repository yang sudah ada.
+
+---
+
+## 📄 Lisensi
+
+Lisensi proyek akan ditentukan secara terpisah.
+
+Sebelum lisensi resmi ditambahkan, jangan menganggap repository ini memiliki izin penggunaan, distribusi, atau modifikasi yang berbeda dari hak yang diberikan oleh pemilik repository.
+
+---
+
+## 👤 LIB-PHILANX
+
+Dibangun secara bertahap dengan fokus pada UI yang sederhana, rapi, dan mudah digunakan.
