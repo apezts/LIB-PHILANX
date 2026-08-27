@@ -1,5 +1,5 @@
 -- Apez UI Library
--- Version: 1.1.0
+-- Version: 1.2.0
 -- Original Roblox UI Library
 -- For Roblox Studio / testing your own game
 
@@ -312,19 +312,59 @@ function UILibrary:CreateWindow(options)
         options = options or {}
 
         local tabName = options.Name or "Tab"
+        local tabIcon = options.Icon
 
         local TabButton = New("TextButton", {
             Parent = TabList,
             Size = UDim2.new(1, 0, 0, 36),
             BackgroundColor3 = Theme.Tertiary,
             BorderSizePixel = 0,
-            Text = tabName,
+            Text = "",
             TextColor3 = Theme.SubText,
             Font = Enum.Font.GothamMedium,
             TextSize = 12,
             AutoButtonColor = false
         })
+
         Corner(TabButton, 6)
+
+        if tabIcon then
+            New("TextLabel", {
+                Parent = TabButton,
+                Position = UDim2.fromOffset(9, 0),
+                Size = UDim2.fromOffset(24, 36),
+                BackgroundTransparency = 1,
+                Text = tostring(tabIcon),
+                TextColor3 = Theme.SubText,
+                Font = Enum.Font.GothamBold,
+                TextSize = 14,
+                TextXAlignment = Enum.TextXAlignment.Center
+            })
+
+            New("TextLabel", {
+                Parent = TabButton,
+                Position = UDim2.fromOffset(38, 0),
+                Size = UDim2.new(1, -46, 1, 0),
+                BackgroundTransparency = 1,
+                Text = tabName,
+                TextColor3 = Theme.SubText,
+                Font = Enum.Font.GothamMedium,
+                TextSize = 12,
+                TextXAlignment = Enum.TextXAlignment.Left
+            })
+        else
+            New("TextLabel", {
+                Parent = TabButton,
+                Position = UDim2.fromOffset(12, 0),
+                Size = UDim2.new(1, -24, 1, 0),
+                BackgroundTransparency = 1,
+                Text = tabName,
+                TextColor3 = Theme.SubText,
+                Font = Enum.Font.GothamMedium,
+                TextSize = 12,
+                TextXAlignment = Enum.TextXAlignment.Left
+            })
+        end
 
         local Page = New("ScrollingFrame", {
             Parent = Content,
@@ -363,17 +403,27 @@ function UILibrary:CreateWindow(options)
             for _, data in ipairs(pages) do
                 data.Page.Visible = false
                 Tween(data.Button, {
-                    BackgroundColor3 = Theme.Tertiary,
-                    TextColor3 = Theme.SubText
+                    BackgroundColor3 = Theme.Tertiary
                 }, 0.15)
+
+                for _, child in ipairs(data.Button:GetChildren()) do
+                    if child:IsA("TextLabel") then
+                        Tween(child, {TextColor3 = Theme.SubText}, 0.15)
+                    end
+                end
             end
 
             Page.Visible = true
 
             Tween(TabButton, {
-                BackgroundColor3 = Theme.Accent,
-                TextColor3 = Color3.fromRGB(255, 255, 255)
+                BackgroundColor3 = Theme.Accent
             }, 0.15)
+
+            for _, child in ipairs(TabButton:GetChildren()) do
+                if child:IsA("TextLabel") then
+                    Tween(child, {TextColor3 = Color3.fromRGB(255, 255, 255)}, 0.15)
+                end
+            end
         end
 
         TabButton.MouseButton1Click:Connect(Select)
@@ -961,20 +1011,31 @@ function UILibrary:CreateWindow(options)
     function Window:Notify(options)
         options = options or {}
 
+        local duration = options.Duration or 3
+        local accent = options.Color or Theme.Accent
+
         local notification = New("Frame", {
-            Parent = ScreenGui,
+            Parent = NotificationHolder,
             Size = UDim2.fromOffset(280, 75),
-            Position = UDim2.new(1, -300, 1, -95),
             BackgroundColor3 = Theme.Secondary,
-            BorderSizePixel = 0
+            BorderSizePixel = 0,
+            LayoutOrder = math.floor(os.clock() * 1000)
         })
 
         Corner(notification, 8)
         Stroke(notification)
 
+        New("Frame", {
+            Parent = notification,
+            Position = UDim2.fromOffset(0, 8),
+            Size = UDim2.fromOffset(3, 59),
+            BackgroundColor3 = accent,
+            BorderSizePixel = 0
+        })
+
         New("TextLabel", {
             Parent = notification,
-            Position = UDim2.fromOffset(12, 8),
+            Position = UDim2.fromOffset(14, 8),
             Size = UDim2.new(1, -24, 0, 20),
             BackgroundTransparency = 1,
             Text = options.Title or "Notification",
@@ -986,7 +1047,7 @@ function UILibrary:CreateWindow(options)
 
         New("TextLabel", {
             Parent = notification,
-            Position = UDim2.fromOffset(12, 30),
+            Position = UDim2.fromOffset(14, 30),
             Size = UDim2.new(1, -24, 0, 35),
             BackgroundTransparency = 1,
             Text = options.Content or "",
@@ -998,23 +1059,26 @@ function UILibrary:CreateWindow(options)
             TextYAlignment = Enum.TextYAlignment.Top
         })
 
-        notification.Position = UDim2.new(1, 20, 1, -95)
+        local progress = New("Frame", {
+            Parent = notification,
+            Position = UDim2.new(0, 0, 1, -3),
+            Size = UDim2.new(1, 0, 0, 3),
+            BackgroundColor3 = accent,
+            BorderSizePixel = 0
+        })
 
-        Tween(notification, {
-            Position = UDim2.new(1, -300, 1, -95)
-        }, 0.25)
+        notification.Position = UDim2.new(1, 320, 0, 0)
+        Tween(notification, {Position = UDim2.new(0, 0, 0, 0)}, 0.25)
+        Tween(progress, {Size = UDim2.new(0, 0, 0, 3)}, duration)
 
-        task.delay(options.Duration or 3, function()
+        task.delay(duration, function()
+            if not notification.Parent then return end
+
+            Tween(notification, {Position = UDim2.new(1, 320, 0, 0)}, 0.25)
+            task.wait(0.3)
+
             if notification.Parent then
-                Tween(notification, {
-                    Position = UDim2.new(1, 20, 1, -95)
-                }, 0.25)
-
-                task.wait(0.3)
-
-                if notification.Parent then
-                    notification:Destroy()
-                end
+                notification:Destroy()
             end
         end)
 
