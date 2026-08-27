@@ -1,5 +1,5 @@
--- Apez UI Library
--- Version: 1.4.3
+-- LIB-PHILANX UI Library
+-- Version: 1.5.0
 -- Original Roblox UI Library
 -- For Roblox Studio / testing your own game
 
@@ -581,7 +581,7 @@ function UILibrary:CreateWindow(options)
             Corner(Section, 7)
             Stroke(Section)
 
-            New("TextLabel", {
+            local SectionTitle = New("TextLabel", {
                 Parent = Section,
                 Position = UDim2.fromOffset(12, 0),
                 Size = UDim2.new(1, -24, 0, 45),
@@ -591,6 +591,32 @@ function UILibrary:CreateWindow(options)
                 Font = Enum.Font.GothamBold,
                 TextSize = 13,
                 TextXAlignment = Enum.TextXAlignment.Left
+            })
+
+            local SectionHeader = New("TextButton", {
+                Parent = Section,
+                Position = UDim2.fromOffset(0, 0),
+                Size = UDim2.new(1, 0, 0, 45),
+                BackgroundTransparency = 1,
+                BorderSizePixel = 0,
+                Text = "",
+                AutoButtonColor = false,
+                ZIndex = 5
+            })
+
+            local SectionArrow = New("TextLabel", {
+                Parent = SectionHeader,
+                AnchorPoint = Vector2.new(1, 0.5),
+                Position = UDim2.new(1, -12, 0.5, 0),
+                Size = UDim2.fromOffset(20, 20),
+                BackgroundTransparency = 1,
+                Text = "−",
+                TextColor3 = Theme.SubText,
+                Font = Enum.Font.GothamBold,
+                TextSize = 14,
+                TextXAlignment = Enum.TextXAlignment.Center,
+                TextYAlignment = Enum.TextYAlignment.Center,
+                ZIndex = 6
             })
 
             local Elements = New("Frame", {
@@ -606,23 +632,69 @@ function UILibrary:CreateWindow(options)
                 Padding = UDim.new(0, 7)
             })
 
-            ElementLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-                Elements.Size = UDim2.new(
+            local collapsed = false
+
+            local function UpdateSectionSize(animate)
+                local contentHeight = collapsed and 0 or ElementLayout.AbsoluteContentSize.Y
+
+                local targetElementsSize = UDim2.new(
                     1,
                     -20,
                     0,
-                    ElementLayout.AbsoluteContentSize.Y
+                    contentHeight
                 )
 
-                Section.Size = UDim2.new(
+                local targetSectionSize = UDim2.new(
                     1,
                     0,
                     0,
-                    55 + ElementLayout.AbsoluteContentSize.Y
+                    collapsed and 45 or (55 + contentHeight)
                 )
+
+                if animate then
+                    Tween(Elements, {Size = targetElementsSize}, 0.18)
+                    Tween(Section, {Size = targetSectionSize}, 0.18)
+                    Tween(SectionArrow, {
+                        Rotation = collapsed and 0 or 0
+                    }, 0.18)
+                else
+                    Elements.Size = targetElementsSize
+                    Section.Size = targetSectionSize
+                end
+
+                SectionArrow.Text = collapsed and "+" or "−"
+            end
+
+            ElementLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+                if not collapsed then
+                    UpdateSectionSize(false)
+                end
             end)
 
             local SectionAPI = {}
+
+            function SectionAPI:SetCollapsed(value)
+                collapsed = value == true
+                UpdateSectionSize(true)
+            end
+
+            function SectionAPI:Toggle()
+                SectionAPI:SetCollapsed(not collapsed)
+            end
+
+            function SectionAPI:IsCollapsed()
+                return collapsed
+            end
+
+            SectionHeader.MouseButton1Click:Connect(function()
+                SectionAPI:Toggle()
+            end)
+
+            AddHover(
+                SectionHeader,
+                Theme.Secondary,
+                Color3.fromRGB(20, 55, 95)
+            )
 
             function SectionAPI:CreateLabel(text)
                 local Label = New("TextLabel", {
@@ -830,18 +902,18 @@ function UILibrary:CreateWindow(options)
                 end)
 
                 AddHover(
-            Button,
-            Theme.Tertiary,
-            Color3.fromRGB(22, 58, 98)
-        )
+                    Button,
+                    Theme.Tertiary,
+                    Color3.fromRGB(22, 58, 98)
+                )
 
-        AddPressAnimation(
-            Button,
-            Theme.Tertiary,
-            Color3.fromRGB(28, 92, 145)
-        )
+                AddPressAnimation(
+                    Button,
+                    Theme.Tertiary,
+                    Color3.fromRGB(28, 92, 145)
+                )
 
-        return Button
+                return Button
             end
 
             function SectionAPI:CreateToggle(options)
@@ -1135,7 +1207,7 @@ function UILibrary:CreateWindow(options)
 
                 local CurrentKey = options.Default or Enum.KeyCode.RightShift
 
-                local Holder = Create("TextButton", {
+                local Holder = New("TextButton", {
                     Parent = Elements,
                     Size = UDim2.new(1, 0, 0, 42),
                     BackgroundColor3 = Theme.Tertiary,
@@ -1144,9 +1216,9 @@ function UILibrary:CreateWindow(options)
                     AutoButtonColor = false
                 })
 
-                AddCorner(Holder, 6)
+                Corner(Holder, 6)
 
-                Create("TextLabel", {
+                New("TextLabel", {
                     Parent = Holder,
                     Position = UDim2.fromOffset(12, 0),
                     Size = UDim2.new(1, -130, 1, 0),
@@ -1158,7 +1230,7 @@ function UILibrary:CreateWindow(options)
                     TextXAlignment = Enum.TextXAlignment.Left
                 })
 
-                local KeyLabel = Create("TextLabel", {
+                local KeyLabel = New("TextLabel", {
                     Parent = Holder,
                     Position = UDim2.new(1, -115, 0, 7),
                     Size = UDim2.fromOffset(100, 28),
@@ -1170,7 +1242,7 @@ function UILibrary:CreateWindow(options)
                     TextSize = 11
                 })
 
-                AddCorner(KeyLabel, 5)
+                Corner(KeyLabel, 5)
 
                 local Listening = false
 
