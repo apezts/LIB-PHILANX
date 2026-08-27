@@ -1,5 +1,5 @@
 -- Apez UI Library
--- Version: 1.3.0 FIX3
+-- Version: 1.4.0
 -- Original Roblox UI Library
 -- For Roblox Studio / testing your own game
 
@@ -12,16 +12,16 @@ local UserInputService = game:GetService("UserInputService")
 local Player = Players.LocalPlayer
 
 local Theme = {
-    Background = Color3.fromRGB(20, 20, 24),
-    Secondary = Color3.fromRGB(27, 27, 32),
-    Tertiary = Color3.fromRGB(35, 35, 42),
-    Accent = Color3.fromRGB(95, 140, 255),
-    Text = Color3.fromRGB(245, 245, 245),
-    SubText = Color3.fromRGB(165, 165, 175),
-    Border = Color3.fromRGB(50, 50, 58),
-    Success = Color3.fromRGB(80, 200, 120),
-    Warning = Color3.fromRGB(255, 190, 70),
-    Error = Color3.fromRGB(240, 80, 80)
+    Background = Color3.fromRGB(8, 12, 22),
+    Secondary = Color3.fromRGB(12, 18, 32),
+    Tertiary = Color3.fromRGB(18, 27, 46),
+    Accent = Color3.fromRGB(35, 155, 255),
+    Text = Color3.fromRGB(245, 250, 255),
+    SubText = Color3.fromRGB(145, 165, 190),
+    Border = Color3.fromRGB(35, 65, 100),
+    Success = Color3.fromRGB(70, 215, 140),
+    Warning = Color3.fromRGB(255, 195, 70),
+    Error = Color3.fromRGB(245, 85, 95)
 }
 
 local function New(class, props)
@@ -163,7 +163,7 @@ function UILibrary:CreateWindow(options)
     })
 
     Corner(Main, 10)
-    Stroke(Main)
+    Stroke(Main, Theme.Border, 1)
 
     local TopBar = New("Frame", {
         Name = "TopBar",
@@ -174,6 +174,17 @@ function UILibrary:CreateWindow(options)
     })
 
     Corner(TopBar, 10)
+
+    local TopAccent = New("Frame", {
+        Name = "TopAccent",
+        Parent = TopBar,
+        Position = UDim2.new(0, 12, 1, -3),
+        Size = UDim2.new(1, -24, 0, 3),
+        BackgroundColor3 = Theme.Accent,
+        BorderSizePixel = 0,
+        ZIndex = 3
+    })
+    Corner(TopAccent, 2)
 
     New("Frame", {
         Parent = TopBar,
@@ -253,6 +264,15 @@ function UILibrary:CreateWindow(options)
         BorderSizePixel = 0
     })
 
+    local SidebarAccent = New("Frame", {
+        Name = "SidebarAccent",
+        Parent = Sidebar,
+        Position = UDim2.new(1, -2, 0, 10),
+        Size = UDim2.new(0, 2, 1, -20),
+        BackgroundColor3 = Theme.Accent,
+        BorderSizePixel = 0
+    })
+
     local TabList = New("ScrollingFrame", {
         Parent = Sidebar,
         Position = UDim2.fromOffset(10, 10),
@@ -285,7 +305,42 @@ function UILibrary:CreateWindow(options)
         BackgroundTransparency = 1
     })
 
+    local ContentAccent = New("Frame", {
+        Name = "ContentAccent",
+        Parent = Content,
+        Position = UDim2.fromOffset(0, 10),
+        Size = UDim2.new(0, 1, 1, -20),
+        BackgroundColor3 = Theme.Border,
+        BorderSizePixel = 0
+    })
+
     MakeDraggable(Main, TopBar)
+
+    local function ButtonHover(button, normalColor, hoverColor)
+        button.MouseEnter:Connect(function()
+            Tween(button, {
+                BackgroundColor3 = hoverColor
+            }, 0.12)
+        end)
+
+        button.MouseLeave:Connect(function()
+            Tween(button, {
+                BackgroundColor3 = normalColor
+            }, 0.12)
+        end)
+    end
+
+    ButtonHover(
+        Minimize,
+        Theme.Tertiary,
+        Color3.fromRGB(28, 48, 76)
+    )
+
+    ButtonHover(
+        Close,
+        Theme.Tertiary,
+        Color3.fromRGB(85, 35, 55)
+    )
 
     local pages = {}
     local Window = {}
@@ -554,7 +609,7 @@ function UILibrary:CreateWindow(options)
                 })
 
                 Corner(Paragraph, 6)
-                Stroke(Paragraph)
+                Stroke(Paragraph, Theme.Border, 1)
 
                 New("TextLabel", {
                     Parent = Paragraph,
