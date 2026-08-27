@@ -1,5 +1,5 @@
 -- Apez UI Library
--- Version: 1.3.0 FIX1
+-- Version: 1.3.0 FIX3
 -- Original Roblox UI Library
 -- For Roblox Studio / testing your own game
 
@@ -183,7 +183,8 @@ function UILibrary:CreateWindow(options)
         BorderSizePixel = 0
     })
 
-    New("TextLabel", {
+    local TitleLabel = New("TextLabel", {
+        Name = "TitleLabel",
         Parent = TopBar,
         Position = UDim2.fromOffset(18, 8),
         Size = UDim2.new(1, -120, 0, 25),
@@ -195,7 +196,8 @@ function UILibrary:CreateWindow(options)
         TextXAlignment = Enum.TextXAlignment.Left
     })
 
-    New("TextLabel", {
+    local SubtitleLabel = New("TextLabel", {
+        Name = "SubtitleLabel",
         Parent = TopBar,
         Position = UDim2.fromOffset(19, 34),
         Size = UDim2.new(1, -120, 0, 18),
@@ -332,39 +334,19 @@ function UILibrary:CreateWindow(options)
     --==================================================
 
     function Window:SetTitle(newTitle)
-        local titleLabel = TopBar:FindFirstChild("TitleLabel")
-
-        if titleLabel and titleLabel:IsA("TextLabel") then
-            titleLabel.Text = tostring(newTitle)
-        end
+        TitleLabel.Text = tostring(newTitle)
     end
 
     function Window:SetSubtitle(newSubtitle)
-        local subtitleLabel = TopBar:FindFirstChild("SubtitleLabel")
-
-        if subtitleLabel and subtitleLabel:IsA("TextLabel") then
-            subtitleLabel.Text = tostring(newSubtitle)
-        end
+        SubtitleLabel.Text = tostring(newSubtitle)
     end
 
     function Window:GetTitle()
-        local titleLabel = TopBar:FindFirstChild("TitleLabel")
-
-        if titleLabel and titleLabel:IsA("TextLabel") then
-            return titleLabel.Text
-        end
-
-        return nil
+        return TitleLabel.Text
     end
 
     function Window:GetSubtitle()
-        local subtitleLabel = TopBar:FindFirstChild("SubtitleLabel")
-
-        if subtitleLabel and subtitleLabel:IsA("TextLabel") then
-            return subtitleLabel.Text
-        end
-
-        return nil
+        return SubtitleLabel.Text
     end
 
     function Window:CreateTab(options)
@@ -558,7 +540,6 @@ function UILibrary:CreateWindow(options)
                     TextXAlignment = Enum.TextXAlignment.Left,
                     TextYAlignment = Enum.TextYAlignment.Center
                 })
-
                 return Label
             end
 
@@ -628,7 +609,6 @@ function UILibrary:CreateWindow(options)
                     BackgroundColor3 = Theme.Border,
                     BorderSizePixel = 0
                 })
-
                 return Divider
             end
 
@@ -636,7 +616,6 @@ function UILibrary:CreateWindow(options)
                 options = options or {}
 
                 local status = string.lower(options.Type or "info")
-
                 local statusColor = Theme.Accent
 
                 if status == "success" then
@@ -655,7 +634,7 @@ function UILibrary:CreateWindow(options)
                 })
 
                 Corner(Box, 6)
-                Stroke(Box, Theme.Border)
+                Stroke(Box)
 
                 local Accent = New("Frame", {
                     Parent = Box,
@@ -1015,7 +994,7 @@ function UILibrary:CreateWindow(options)
 
                 local CurrentKey = options.Default or Enum.KeyCode.RightShift
 
-                local Holder = New("TextButton", {
+                local Holder = Create("TextButton", {
                     Parent = Elements,
                     Size = UDim2.new(1, 0, 0, 42),
                     BackgroundColor3 = Theme.Tertiary,
@@ -1024,9 +1003,9 @@ function UILibrary:CreateWindow(options)
                     AutoButtonColor = false
                 })
 
-                Corner(Holder, 6)
+                AddCorner(Holder, 6)
 
-                New("TextLabel", {
+                Create("TextLabel", {
                     Parent = Holder,
                     Position = UDim2.fromOffset(12, 0),
                     Size = UDim2.new(1, -130, 1, 0),
@@ -1038,7 +1017,7 @@ function UILibrary:CreateWindow(options)
                     TextXAlignment = Enum.TextXAlignment.Left
                 })
 
-                local KeyLabel = New("TextLabel", {
+                local KeyLabel = Create("TextLabel", {
                     Parent = Holder,
                     Position = UDim2.new(1, -115, 0, 7),
                     Size = UDim2.fromOffset(100, 28),
@@ -1050,7 +1029,7 @@ function UILibrary:CreateWindow(options)
                     TextSize = 11
                 })
 
-                Corner(KeyLabel, 5)
+                AddCorner(KeyLabel, 5)
 
                 local Listening = false
 
