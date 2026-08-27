@@ -1,5 +1,5 @@
 -- LIB-PHILANX UI Library
--- Version: 1.5.0
+-- Version: 1.5.1
 -- Original Roblox UI Library
 -- For Roblox Studio / testing your own game
 
@@ -509,26 +509,25 @@ function UILibrary:CreateWindow(options)
             Size = UDim2.new(1, 0, 1, 0),
             BackgroundTransparency = 1,
             BorderSizePixel = 0,
-            ScrollBarThickness = 3,
+            ScrollBarThickness = 4,
             ScrollBarImageColor3 = Theme.Accent,
+            ScrollBarImageTransparency = 0.15,
             CanvasSize = UDim2.new(),
+            AutomaticCanvasSize = Enum.AutomaticSize.Y,
+            ScrollingDirection = Enum.ScrollingDirection.Y,
+            ScrollingEnabled = true,
+            Active = true,
+            ElasticBehavior = Enum.ElasticBehavior.WhenScrollable,
             Visible = false
         })
 
-        Padding(Page, 15, 15, 15, 15)
+        Padding(Page, 15, 15, 15, 20)
 
         local Layout = New("UIListLayout", {
             Parent = Page,
             SortOrder = Enum.SortOrder.LayoutOrder,
             Padding = UDim.new(0, 10)
         })
-
-        Layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-            Page.CanvasSize = UDim2.fromOffset(
-                0,
-                Layout.AbsoluteContentSize.Y + 30
-            )
-        end)
 
         table.insert(pages, {
             Button = TabButton,
