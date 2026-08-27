@@ -1,5 +1,5 @@
 -- Apez UI Library
--- Version: 1.3.0
+-- Version: 1.3.0 FIX1
 -- Original Roblox UI Library
 -- For Roblox Studio / testing your own game
 
@@ -546,7 +546,7 @@ function UILibrary:CreateWindow(options)
             local SectionAPI = {}
 
             function SectionAPI:CreateLabel(text)
-                local Label = Create("TextLabel", {
+                local Label = New("TextLabel", {
                     Parent = Elements,
                     Size = UDim2.new(1, 0, 0, 28),
                     BackgroundTransparency = 1,
@@ -565,17 +565,17 @@ function UILibrary:CreateWindow(options)
             function SectionAPI:CreateParagraph(options)
                 options = options or {}
 
-                local Paragraph = Create("Frame", {
+                local Paragraph = New("Frame", {
                     Parent = Elements,
                     Size = UDim2.new(1, 0, 0, 65),
                     BackgroundColor3 = Theme.Tertiary,
                     BorderSizePixel = 0
                 })
 
-                AddCorner(Paragraph, 6)
-                AddStroke(Paragraph)
+                Corner(Paragraph, 6)
+                Stroke(Paragraph)
 
-                Create("TextLabel", {
+                New("TextLabel", {
                     Parent = Paragraph,
                     Position = UDim2.fromOffset(12, 7),
                     Size = UDim2.new(1, -24, 0, 18),
@@ -587,7 +587,7 @@ function UILibrary:CreateWindow(options)
                     TextXAlignment = Enum.TextXAlignment.Left
                 })
 
-                local Content = Create("TextLabel", {
+                local Content = New("TextLabel", {
                     Parent = Paragraph,
                     Position = UDim2.fromOffset(12, 28),
                     Size = UDim2.new(1, -24, 0, 30),
@@ -622,7 +622,7 @@ function UILibrary:CreateWindow(options)
             end
 
             function SectionAPI:CreateDivider()
-                local Divider = Create("Frame", {
+                local Divider = New("Frame", {
                     Parent = Elements,
                     Size = UDim2.new(1, 0, 0, 1),
                     BackgroundColor3 = Theme.Border,
@@ -647,17 +647,17 @@ function UILibrary:CreateWindow(options)
                     statusColor = Theme.Error
                 end
 
-                local Box = Create("Frame", {
+                local Box = New("Frame", {
                     Parent = Elements,
                     Size = UDim2.new(1, 0, 0, 62),
                     BackgroundColor3 = Theme.Tertiary,
                     BorderSizePixel = 0
                 })
 
-                AddCorner(Box, 6)
-                AddStroke(Box, Theme.Border)
+                Corner(Box, 6)
+                Stroke(Box, Theme.Border)
 
-                local Accent = Create("Frame", {
+                local Accent = New("Frame", {
                     Parent = Box,
                     Position = UDim2.fromOffset(0, 7),
                     Size = UDim2.fromOffset(3, 48),
@@ -665,9 +665,9 @@ function UILibrary:CreateWindow(options)
                     BorderSizePixel = 0
                 })
 
-                AddCorner(Accent, 3)
+                Corner(Accent, 3)
 
-                local Title = Create("TextLabel", {
+                local Title = New("TextLabel", {
                     Parent = Box,
                     Position = UDim2.fromOffset(13, 7),
                     Size = UDim2.new(1, -25, 0, 18),
@@ -679,7 +679,7 @@ function UILibrary:CreateWindow(options)
                     TextXAlignment = Enum.TextXAlignment.Left
                 })
 
-                local Content = Create("TextLabel", {
+                local Content = New("TextLabel", {
                     Parent = Box,
                     Position = UDim2.fromOffset(13, 28),
                     Size = UDim2.new(1, -25, 0, 27),
@@ -1015,7 +1015,7 @@ function UILibrary:CreateWindow(options)
 
                 local CurrentKey = options.Default or Enum.KeyCode.RightShift
 
-                local Holder = Create("TextButton", {
+                local Holder = New("TextButton", {
                     Parent = Elements,
                     Size = UDim2.new(1, 0, 0, 42),
                     BackgroundColor3 = Theme.Tertiary,
@@ -1024,9 +1024,9 @@ function UILibrary:CreateWindow(options)
                     AutoButtonColor = false
                 })
 
-                AddCorner(Holder, 6)
+                Corner(Holder, 6)
 
-                Create("TextLabel", {
+                New("TextLabel", {
                     Parent = Holder,
                     Position = UDim2.fromOffset(12, 0),
                     Size = UDim2.new(1, -130, 1, 0),
@@ -1038,7 +1038,7 @@ function UILibrary:CreateWindow(options)
                     TextXAlignment = Enum.TextXAlignment.Left
                 })
 
-                local KeyLabel = Create("TextLabel", {
+                local KeyLabel = New("TextLabel", {
                     Parent = Holder,
                     Position = UDim2.new(1, -115, 0, 7),
                     Size = UDim2.fromOffset(100, 28),
@@ -1050,7 +1050,7 @@ function UILibrary:CreateWindow(options)
                     TextSize = 11
                 })
 
-                AddCorner(KeyLabel, 5)
+                Corner(KeyLabel, 5)
 
                 local Listening = false
 
