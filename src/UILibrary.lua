@@ -1,5 +1,5 @@
 -- Apez UI Library
--- Version: 1.0.0
+-- Version: 1.1.0
 -- Original Roblox UI Library
 -- For Roblox Studio / testing your own game
 
@@ -285,6 +285,28 @@ function UILibrary:CreateWindow(options)
     Close.MouseButton1Click:Connect(function()
         ScreenGui:Destroy()
     end)
+
+    --==================================================
+    -- WINDOW CONTROL
+    --==================================================
+
+    function Window:SetVisible(visible)
+        ScreenGui.Enabled = visible == true
+    end
+
+    function Window:Toggle()
+        ScreenGui.Enabled = not ScreenGui.Enabled
+    end
+
+    function Window:IsVisible()
+        return ScreenGui.Enabled
+    end
+
+    function Window:Destroy()
+        if ScreenGui and ScreenGui.Parent then
+            ScreenGui:Destroy()
+        end
+    end
 
     function Window:CreateTab(options)
         options = options or {}
@@ -697,6 +719,111 @@ function UILibrary:CreateWindow(options)
 
                 function API:Get()
                     return selected
+                end
+
+                return API
+            end
+
+            function SectionAPI:CreateKeybind(options)
+                options = options or {}
+
+                local CurrentKey = options.Default or Enum.KeyCode.RightShift
+
+                local Holder = Create("TextButton", {
+                    Parent = Elements,
+                    Size = UDim2.new(1, 0, 0, 42),
+                    BackgroundColor3 = Theme.Tertiary,
+                    BorderSizePixel = 0,
+                    Text = "",
+                    AutoButtonColor = false
+                })
+
+                AddCorner(Holder, 6)
+
+                Create("TextLabel", {
+                    Parent = Holder,
+                    Position = UDim2.fromOffset(12, 0),
+                    Size = UDim2.new(1, -130, 1, 0),
+                    BackgroundTransparency = 1,
+                    Text = options.Name or "Keybind",
+                    TextColor3 = Theme.Text,
+                    Font = Enum.Font.GothamMedium,
+                    TextSize = 12,
+                    TextXAlignment = Enum.TextXAlignment.Left
+                })
+
+                local KeyLabel = Create("TextLabel", {
+                    Parent = Holder,
+                    Position = UDim2.new(1, -115, 0, 7),
+                    Size = UDim2.fromOffset(100, 28),
+                    BackgroundColor3 = Theme.Background,
+                    BorderSizePixel = 0,
+                    Text = CurrentKey.Name,
+                    TextColor3 = Theme.Accent,
+                    Font = Enum.Font.GothamBold,
+                    TextSize = 11
+                })
+
+                AddCorner(KeyLabel, 5)
+
+                local Listening = false
+
+                Holder.MouseButton1Click:Connect(function()
+                    if Listening then
+                        return
+                    end
+
+                    Listening = true
+                    KeyLabel.Text = "Press key..."
+
+                    local connection
+                    connection = UserInputService.InputBegan:Connect(function(input, processed)
+                        if processed then
+                            return
+                        end
+
+                        if input.UserInputType == Enum.UserInputType.Keyboard then
+                            CurrentKey = input.KeyCode
+                            KeyLabel.Text = CurrentKey.Name
+                            Listening = false
+                            connection:Disconnect()
+
+                            if options.Changed then
+                                task.spawn(options.Changed, CurrentKey)
+                            end
+                        end
+                    end)
+                end)
+
+                UserInputService.InputBegan:Connect(function(input, processed)
+                    if processed or Listening then
+                        return
+                    end
+
+                    if input.UserInputType == Enum.UserInputType.Keyboard
+                        and input.KeyCode == CurrentKey then
+
+                        if options.Callback then
+                            task.spawn(options.Callback, CurrentKey)
+                        end
+                    end
+                end)
+
+                local API = {}
+
+                function API:Set(key)
+                    if typeof(key) == "EnumItem" and key.EnumType == Enum.KeyCode then
+                        CurrentKey = key
+                        KeyLabel.Text = CurrentKey.Name
+
+                        if options.Changed then
+                            task.spawn(options.Changed, CurrentKey)
+                        end
+                    end
+                end
+
+                function API:Get()
+                    return CurrentKey
                 end
 
                 return API
