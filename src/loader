@@ -1,44 +1,14 @@
 --========================================================--
---                    PHILANX LOADER                      --
---                    VERSION 1.4.3                       --
---========================================================--
---
--- KEY PERSISTENCE
---
--- Setelah key berhasil:
---   key disimpan di workspace executor.
---
--- Execute berikutnya:
---   saved key dibaca
---   -> verifikasi ulang ke server dengan HWID sekarang
---   -> jika masih valid: langsung Main Source
---   -> jika expired/revoked/invalid: hapus saved key
---      lalu tampilkan Key System
---
--- File lokal:
---   LIB-PHILANX/PHILANX_KEY.dat
---
--- Folder:
---   LIB-PHILANX harus sudah tersedia di workspace executor.
---
--- Catatan:
---   Persistence ini bergantung pada dukungan executor terhadap
---   isfile/readfile/writefile/delfile.
---
---========================================================--
-
-
---========================================================--
 -- CONFIG
 --========================================================--
 
 local CONFIG = {
 
     UI_LIBRARY_URL =
-        "https://pastebin.com/raw/6Fu9M0tv",
+        "https://raw.githubusercontent.com/apezts/LIB-PHILANX/refs/heads/main/src/UILibrary.lua",
 
     KEY_SYSTEM_URL =
-        "https://pastebin.com/raw/VHKFp9fe",
+        "https://raw.githubusercontent.com/apezts/LIB-PHILANX/refs/heads/main/src/keysystem",
 
     MAIN_SOURCE_URL =
         "https://pastebin.com/raw/r6PFE8nm",
