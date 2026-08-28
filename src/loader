@@ -20,7 +20,7 @@ local CONFIG = {
         "Masukkan key untuk melanjutkan",
 
     KEY_FILE =
-        "LIB-PHILANX/PHILANX_KEY.dat",
+        "PHILANX-HUB/PHILANX_KEY.dat",
 
     DEBUG =
         false
