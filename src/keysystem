@@ -1,0 +1,941 @@
+--========================================================--
+--              PHILANX KEY SYSTEM                        --
+--              UI LIBRARY INTEGRATION                    --
+--              VERSION 1.1.0                             --
+--========================================================--
+--
+-- File terpisah dari UI Library.
+--
+-- Dependency:
+--   1. LIB-PHILANX UI Library v2.8.3 (baseline)
+--
+-- Pemakaian:
+--
+-- local KeySystem = loadstring(KEY_SYSTEM_SOURCE)()
+--
+-- KeySystem:Start({
+--     UILibrary = UILibrary,
+--     OnVerified = function(info)
+--         -- Jalankan PHILANX utama di sini
+--     end
+-- })
+--
+--========================================================--
+
+local HttpService = game:GetService("HttpService")
+
+local KeySystem = {}
+
+local API_URL =
+    "https://script.google.com/macros/s/AKfycbxhim11KSL2Wu-4R5dyXw07UFlSptHprPQwonAtDlEtqkPuhe8a43EVQaKC0KrdHfrs/exec"
+
+
+--========================================================--
+-- HTTP
+--========================================================--
+
+local function GetRequestFunction()
+
+    if type(request) == "function" then
+        return request
+    end
+
+    if type(http_request) == "function" then
+        return http_request
+    end
+
+    if syn and type(syn.request) == "function" then
+        return syn.request
+    end
+
+    return nil
+end
+
+
+local function SendRequest(body)
+
+    local requestFunction =
+        GetRequestFunction()
+
+    if not requestFunction then
+        return false, {
+            error =
+                "Fungsi HTTP request tidak tersedia."
+        }
+    end
+
+
+    local encoded
+
+    local encodeOK, encodeResult =
+        pcall(function()
+            return HttpService:JSONEncode(body)
+        end)
+
+
+    if not encodeOK then
+        return false, {
+            error = "Gagal membuat JSON request."
+        }
+    end
+
+
+    encoded = encodeResult
+
+
+    local requestOK, response =
+        pcall(function()
+
+            return requestFunction({
+                Url = API_URL,
+
+                Method = "POST",
+
+                Headers = {
+                    ["Content-Type"] =
+                        "application/json"
+                },
+
+                Body = encoded
+            })
+
+        end)
+
+
+    if not requestOK then
+
+        return false, {
+            error =
+                "Gagal menghubungi server."
+        }
+
+    end
+
+
+    if type(response) ~= "table" then
+
+        return false, {
+            error =
+                "Response server tidak valid."
+        }
+
+    end
+
+
+    local statusCode =
+        tonumber(
+            response.StatusCode
+        ) or 0
+
+
+    if statusCode < 200
+        or statusCode >= 300 then
+
+        return false, {
+            error =
+                "HTTP " ..
+                tostring(statusCode)
+        }
+
+    end
+
+
+    local raw =
+        tostring(
+            response.Body or ""
+        )
+
+
+    local decodeOK, result =
+        pcall(function()
+
+            return HttpService:JSONDecode(
+                raw
+            )
+
+        end)
+
+
+    if not decodeOK
+        or type(result) ~= "table" then
+
+        return false, {
+            error =
+                "Response server bukan JSON valid."
+        }
+
+    end
+
+
+    return true, result
+
+end
+
+
+--========================================================--
+-- HWID
+--========================================================--
+
+local function GetDeviceIdentifier()
+
+    if type(gethwid) ~= "function" then
+
+        return nil,
+            "gethwid tidak tersedia pada executor."
+
+    end
+
+
+    local ok, result =
+        pcall(gethwid)
+
+
+    if not ok then
+
+        return nil,
+            "Gagal mendapatkan HWID."
+
+    end
+
+
+    result =
+        tostring(result or "")
+
+
+    if result == "" then
+
+        return nil,
+            "HWID kosong."
+
+    end
+
+
+    return result
+
+end
+
+
+--========================================================--
+-- KEY NORMALIZATION
+--========================================================--
+
+local function NormalizeKey(value)
+
+    value =
+        tostring(value or "")
+
+    value =
+        value:gsub(
+            "^%s+",
+            ""
+        )
+
+    value =
+        value:gsub(
+            "%s+$",
+            ""
+        )
+
+    return string.upper(value)
+
+end
+
+
+--========================================================--
+-- ERROR MESSAGE
+--========================================================--
+
+local ErrorMessages = {
+
+    not_found =
+        "Key tidak ditemukan.",
+
+    revoked =
+        "Key telah dinonaktifkan.",
+
+    expired =
+        "Key telah kedaluwarsa.",
+
+    inactive =
+        "Key tidak aktif.",
+
+    hwid_mismatch =
+        "Key sudah terikat ke perangkat lain.",
+
+    missing_key =
+        "Masukkan key terlebih dahulu.",
+
+    identifier_error =
+        "HWID tidak dapat diperoleh.",
+
+    request_error =
+        "Gagal menghubungi server."
+
+}
+
+
+--========================================================--
+-- START
+--========================================================--
+
+--========================================================--
+-- VERIFY SAVED KEY (NO UI)
+--========================================================--
+--
+-- Dipakai Loader untuk memeriksa key yang tersimpan
+-- di workspace tanpa menampilkan Key System UI.
+--
+-- Return:
+--   true, result  -> valid
+--   false, result -> invalid/error
+--
+-- Tidak mengubah usage untuk HWID yang sudah terikat.
+-- Server yang menjadi sumber keputusan valid/invalid.
+--
+function KeySystem:VerifySavedKey(savedKey)
+
+    local normalizedKey =
+        NormalizeKey(savedKey)
+
+
+    if normalizedKey == "" then
+
+        return false, {
+            valid = false,
+            reason = "missing_key"
+        }
+
+    end
+
+
+    local hwid,
+        hwidError =
+        GetDeviceIdentifier()
+
+
+    if not hwid then
+
+        return false, {
+            valid = false,
+            reason = "identifier_error",
+            error = hwidError
+        }
+
+    end
+
+
+    local success,
+        result =
+        SendRequest({
+
+            action = "verify",
+
+            key =
+                normalizedKey,
+
+            hwid =
+                hwid
+
+        })
+
+
+    if not success then
+
+        return false, {
+            valid = false,
+            reason = "request_error",
+            error =
+                result.error
+                or "Gagal menghubungi server."
+        }
+
+    end
+
+
+    if type(result) ~= "table" then
+
+        return false, {
+            valid = false,
+            reason = "invalid_response",
+            error = "Response server tidak valid."
+        }
+
+    end
+
+
+    -- Simpan key yang dinormalisasi di hasil,
+    -- agar Loader dapat menggunakannya jika diperlukan.
+
+    result.key =
+        result.key
+        or normalizedKey
+
+
+    if result.valid == true then
+
+        return true, result
+
+    end
+
+
+    return false, result
+
+end
+
+
+function KeySystem:Start(options)
+
+    options = options or {}
+
+
+    local UILibrary =
+        options.UILibrary
+
+
+    if type(UILibrary) ~= "table" then
+
+        error(
+            "KeySystem membutuhkan UILibrary."
+        )
+
+    end
+
+
+    if type(UILibrary.CreateWindow)
+        ~= "function" then
+
+        error(
+            "UILibrary.CreateWindow tidak tersedia."
+        )
+
+    end
+
+
+    local onVerified =
+        options.OnVerified
+
+
+    local onFailed =
+        options.OnFailed
+
+
+    local title =
+        options.Title
+        or "PHILANX Key System"
+
+
+    local subtitle =
+        options.Subtitle
+        or "Masukkan key untuk melanjutkan"
+
+
+    local currentKey = ""
+
+    local verifying = false
+
+    local verified = false
+
+
+    --====================================================--
+    -- WINDOW
+    --====================================================--
+
+    local Window =
+        UILibrary:CreateWindow({
+
+            Title = title,
+
+            Subtitle = subtitle,
+
+            Size =
+                options.Size
+                or UDim2.fromOffset(
+                    560,
+                    360
+                ),
+
+            Logo =
+                options.Logo
+
+        })
+
+
+    local Tab =
+        Window:CreateTab({
+
+            Name = "Key System",
+
+            Icon = "🔑"
+
+        })
+
+
+    local Section =
+        Tab:CreateSection(
+            "Verifikasi Key"
+        )
+
+
+    --====================================================--
+    -- STATUS
+    --====================================================--
+
+    local StatusBox =
+        Section:CreateStatusBox({
+
+            Title = "STATUS",
+
+            Content =
+                "Masukkan key untuk memulai.",
+
+            Type = "info"
+
+        })
+
+
+    local function SetStatus(
+        content,
+        statusType,
+        statusTitle
+    )
+
+        if not StatusBox then
+            return
+        end
+
+
+        pcall(function()
+
+            if StatusBox.SetTitle then
+
+                StatusBox:SetTitle(
+                    statusTitle
+                    or string.upper(
+                        statusType
+                        or "info"
+                    )
+                )
+
+            end
+
+
+            if StatusBox.SetContent then
+
+                StatusBox:SetContent(
+                    tostring(
+                        content or ""
+                    )
+                )
+
+            end
+
+
+            if StatusBox.SetType then
+
+                StatusBox:SetType(
+                    statusType
+                    or "info"
+                )
+
+            end
+
+        end)
+
+    end
+
+
+    --====================================================--
+    -- KEY INPUT
+    --====================================================--
+
+    local KeyInput =
+        Section:CreateInput({
+
+            Name = "Key",
+
+            Placeholder =
+                "PHX-XXXX-XXXX-XXXX",
+
+            Default = "",
+
+            ConfigIgnore = true,
+
+            Callback =
+                function(value)
+
+                    currentKey =
+                        NormalizeKey(
+                            value
+                        )
+
+                end
+
+        })
+
+
+    --====================================================--
+    -- VERIFY
+    --====================================================--
+
+    local VerifyButton
+
+
+    VerifyButton =
+        Section:CreateButton({
+
+            Name =
+                "🔐 Verifikasi Key",
+
+            ConfigIgnore = true,
+
+            Callback =
+                function()
+
+                    if verifying
+                        or verified then
+                        return
+                    end
+
+
+                    -- Ambil langsung dari TextBox
+                    -- agar tidak bergantung pada
+                    -- FocusLost sebelumnya.
+
+                    if KeyInput then
+
+                        currentKey =
+                            NormalizeKey(
+                                KeyInput.Text
+                            )
+
+                    end
+
+
+                    if currentKey == "" then
+
+                        SetStatus(
+                            ErrorMessages.missing_key,
+                            "error",
+                            "KEY ERROR"
+                        )
+
+                        if onFailed then
+
+                            task.spawn(
+                                function()
+
+                                    pcall(
+                                        onFailed,
+                                        "missing_key"
+                                    )
+
+                                end
+                            )
+
+                        end
+
+                        return
+
+                    end
+
+
+                    verifying = true
+
+
+                    SetStatus(
+                        "Mendapatkan HWID...",
+                        "warning",
+                        "VERIFIKASI"
+                    )
+
+
+                    local hwid,
+                        hwidError =
+                        GetDeviceIdentifier()
+
+
+                    if not hwid then
+
+                        verifying = false
+
+
+                        SetStatus(
+                            hwidError,
+                            "error",
+                            "HWID ERROR"
+                        )
+
+
+                        if onFailed then
+
+                            task.spawn(
+                                function()
+
+                                    pcall(
+                                        onFailed,
+                                        "identifier_error"
+                                    )
+
+                                end
+                            )
+
+                        end
+
+                        return
+
+                    end
+
+
+                    SetStatus(
+                        "Menghubungi server...",
+                        "warning",
+                        "VERIFIKASI"
+                    )
+
+
+                    local success,
+                        result =
+                        SendRequest({
+
+                            action = "verify",
+
+                            key =
+                                currentKey,
+
+                            hwid =
+                                hwid
+
+                        })
+
+
+                    if not success then
+
+                        verifying = false
+
+
+                        SetStatus(
+                            result.error
+                            or ErrorMessages.request_error,
+                            "error",
+                            "SERVER ERROR"
+                        )
+
+
+                        if onFailed then
+
+                            task.spawn(
+                                function()
+
+                                    pcall(
+                                        onFailed,
+                                        "request_error"
+                                    )
+
+                                end
+                            )
+
+                        end
+
+                        return
+
+                    end
+
+
+                    --================================================--
+                    -- VALID
+                    --================================================--
+
+                    if result.valid == true then
+
+                        verified = true
+
+                        verifying = false
+
+
+                        -- Tutup UI Key System setelah
+                        -- verifikasi berhasil.
+                        --
+                        -- Baseline UI Library menyediakan
+                        -- Window:Destroy() untuk menghapus
+                        -- ScreenGui Key System.
+
+                        if Window
+                            and type(Window.Destroy)
+                            == "function" then
+
+                            pcall(function()
+                                Window:Destroy()
+                            end)
+
+                        elseif Window
+                            and type(Window.SetVisible)
+                            == "function" then
+
+                            pcall(function()
+                                Window:SetVisible(false)
+                            end)
+
+                        end
+
+
+                        -- Pastikan key yang berhasil diverifikasi
+                        -- tersedia bagi Loader untuk disimpan.
+                        result.key =
+                            result.key
+                            or currentKey
+
+
+                        local action =
+                            tostring(
+                                result.action
+                                or "verified"
+                            )
+
+
+                        if action == "bound" then
+
+                            SetStatus(
+                                "Key berhasil diaktifkan dan HWID berhasil diikat.",
+                                "success",
+                                "KEY AKTIF"
+                            )
+
+                        else
+
+                            SetStatus(
+                                "Key berhasil diverifikasi.",
+                                "success",
+                                "KEY VALID"
+                            )
+
+                        end
+
+
+                        -- Berikan hasil server
+                        -- lengkap ke script utama.
+
+                        if onVerified then
+
+                            task.spawn(
+                                function()
+
+                                    pcall(
+                                        onVerified,
+                                        result
+                                    )
+
+                                end
+                            )
+
+                        end
+
+
+                        return
+
+                    end
+
+
+                    --================================================--
+                    -- INVALID
+                    --================================================--
+
+                    verifying = false
+
+
+                    local reason =
+                        tostring(
+                            result.reason
+                            or result.error
+                            or "unknown"
+                        )
+
+
+                    SetStatus(
+                        ErrorMessages[reason]
+                        or "Key tidak dapat digunakan.",
+                        "error",
+                        "KEY DITOLAK"
+                    )
+
+
+                    if onFailed then
+
+                        task.spawn(
+                            function()
+
+                                pcall(
+                                    onFailed,
+                                    reason
+                                )
+
+                            end
+                        )
+
+                    end
+
+                end
+
+        })
+
+
+    --====================================================--
+    -- INFO
+    --====================================================--
+
+    Section:CreateParagraph({
+
+        Title =
+            "Informasi",
+
+        Content =
+            "Key hanya dapat digunakan pada HWID yang telah terikat. Setelah valid, script utama dapat dijalankan melalui callback OnVerified."
+
+    })
+
+
+    --====================================================--
+    -- RETURN API
+    --====================================================--
+
+    return {
+
+        Window = Window,
+
+        Input = KeyInput,
+
+        GetKey =
+            function()
+
+                return currentKey
+
+            end,
+
+        IsVerified =
+            function()
+
+                return verified
+
+            end,
+
+        Verify =
+            function()
+
+                if VerifyButton
+                    and VerifyButton.Activate then
+
+                    VerifyButton:Activate()
+
+                    return true
+
+                end
+
+                return false
+
+            end
+
+    }
+
+end
+
+
+return KeySystem
