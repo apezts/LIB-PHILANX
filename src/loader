@@ -11,7 +11,7 @@ local CONFIG = {
         "https://raw.githubusercontent.com/apezts/LIB-PHILANX/refs/heads/main/src/keysystem",
 
     MAIN_SOURCE_URL =
-        "https://pastebin.com/raw/r6PFE8nm",
+        "https://raw.githubusercontent.com/apezts/Nezha/refs/heads/main/loader",
 
     KEY_TITLE =
         "PHILANX Key System",
