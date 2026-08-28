@@ -1,0 +1,1055 @@
+--========================================================--
+--                    PHILANX LOADER                      --
+--                    VERSION 1.4.3                       --
+--========================================================--
+--
+-- KEY PERSISTENCE
+--
+-- Setelah key berhasil:
+--   key disimpan di workspace executor.
+--
+-- Execute berikutnya:
+--   saved key dibaca
+--   -> verifikasi ulang ke server dengan HWID sekarang
+--   -> jika masih valid: langsung Main Source
+--   -> jika expired/revoked/invalid: hapus saved key
+--      lalu tampilkan Key System
+--
+-- File lokal:
+--   LIB-PHILANX/PHILANX_KEY.dat
+--
+-- Folder:
+--   LIB-PHILANX harus sudah tersedia di workspace executor.
+--
+-- Catatan:
+--   Persistence ini bergantung pada dukungan executor terhadap
+--   isfile/readfile/writefile/delfile.
+--
+--========================================================--
+
+
+--========================================================--
+-- CONFIG
+--========================================================--
+
+local CONFIG = {
+
+    UI_LIBRARY_URL =
+        "https://pastebin.com/raw/6Fu9M0tv",
+
+    KEY_SYSTEM_URL =
+        "https://pastebin.com/raw/VHKFp9fe",
+
+    MAIN_SOURCE_URL =
+        "https://pastebin.com/raw/r6PFE8nm",
+
+    KEY_TITLE =
+        "PHILANX Key System",
+
+    KEY_SUBTITLE =
+        "Masukkan key untuk melanjutkan",
+
+    KEY_FILE =
+        "LIB-PHILANX/PHILANX_KEY.dat",
+
+    DEBUG =
+        false
+
+}
+
+
+--========================================================--
+-- LOGGING
+--========================================================--
+
+local function Log(message)
+
+    if CONFIG.DEBUG then
+
+        print(
+            "[PHILANX] " ..
+            tostring(message)
+        )
+
+    end
+
+end
+
+
+local function LogError(message)
+
+    warn(
+        "[PHILANX] " ..
+        tostring(message)
+    )
+
+end
+
+
+--========================================================--
+-- LOCAL FILE PERSISTENCE
+--========================================================--
+
+local function GetFileAPI()
+
+    local available = {
+
+        isfile =
+            type(isfile) == "function",
+
+        readfile =
+            type(readfile) == "function",
+
+        writefile =
+            type(writefile) == "function",
+
+        delfile =
+            type(delfile) == "function"
+
+    }
+
+    return available
+
+end
+
+
+local function ReadSavedKey()
+
+    local api =
+        GetFileAPI()
+
+
+    if not api.isfile
+        or not api.readfile then
+
+        Log(
+            "Workspace persistence tidak tersedia."
+        )
+
+        return nil
+
+    end
+
+
+    local existsOK,
+        exists =
+        pcall(function()
+
+            return isfile(
+                CONFIG.KEY_FILE
+            )
+
+        end)
+
+
+    if not existsOK
+        or not exists then
+
+        return nil
+
+    end
+
+
+    local readOK,
+        saved =
+        pcall(function()
+
+            return readfile(
+                CONFIG.KEY_FILE
+            )
+
+        end)
+
+
+    if not readOK then
+
+        LogError(
+            "Gagal membaca saved key."
+        )
+
+        return nil
+
+    end
+
+
+    saved =
+        tostring(
+            saved or ""
+        )
+
+
+    saved =
+        saved:gsub(
+            "^%s+",
+            ""
+        ):gsub(
+            "%s+$",
+            ""
+        )
+
+
+    if saved == "" then
+
+        return nil
+
+    end
+
+
+    return saved
+
+end
+
+
+local function SaveKey(key)
+
+    local api =
+        GetFileAPI()
+
+
+    if not api.writefile then
+
+        Log(
+            "writefile tidak tersedia; key tidak disimpan."
+        )
+
+        return false
+
+    end
+
+
+    local ok,
+        err =
+        pcall(function()
+
+            writefile(
+                CONFIG.KEY_FILE,
+                tostring(key)
+            )
+
+        end)
+
+
+    if not ok then
+
+        LogError(
+            "Gagal menyimpan key: " ..
+            tostring(err)
+        )
+
+        return false
+
+    end
+
+
+    Log(
+        "Key berhasil disimpan ke workspace."
+    )
+
+    return true
+
+end
+
+
+local function DeleteSavedKey()
+
+    local api =
+        GetFileAPI()
+
+
+    if not api.delfile
+        or not api.isfile then
+
+        return false
+
+    end
+
+
+    local existsOK,
+        exists =
+        pcall(function()
+
+            return isfile(
+                CONFIG.KEY_FILE
+            )
+
+        end)
+
+
+    if not existsOK
+        or not exists then
+
+        return true
+
+    end
+
+
+    local ok,
+        err =
+        pcall(function()
+
+            delfile(
+                CONFIG.KEY_FILE
+            )
+
+        end)
+
+
+    if not ok then
+
+        LogError(
+            "Gagal menghapus saved key: " ..
+            tostring(err)
+        )
+
+        return false
+
+    end
+
+
+    Log(
+        "Saved key dihapus."
+    )
+
+    return true
+
+end
+
+
+--========================================================--
+-- HTTP
+--========================================================--
+
+local function GetRequestFunction()
+
+    if type(request) == "function" then
+        return request
+    end
+
+    if type(http_request) == "function" then
+        return http_request
+    end
+
+    if syn
+        and type(syn.request) == "function" then
+
+        return syn.request
+    end
+
+    return nil
+
+end
+
+
+local function HttpGet(url)
+
+    if type(game.HttpGet) == "function" then
+
+        return game:HttpGet(url)
+
+    end
+
+
+    local requestFunction =
+        GetRequestFunction()
+
+
+    if not requestFunction then
+
+        error(
+            "HTTP GET tidak tersedia."
+        )
+
+    end
+
+
+    local response =
+        requestFunction({
+
+            Url = url,
+
+            Method = "GET"
+
+        })
+
+
+    if type(response) ~= "table" then
+
+        error(
+            "Response HTTP tidak valid."
+        )
+
+    end
+
+
+    local status =
+        tonumber(
+            response.StatusCode or 0
+        ) or 0
+
+
+    if status < 200
+        or status >= 300 then
+
+        error(
+            "HTTP " ..
+            tostring(status)
+        )
+
+    end
+
+
+    return tostring(
+        response.Body or ""
+    )
+
+end
+
+
+--========================================================--
+-- LOAD REMOTE MODULE
+--========================================================--
+
+local function LoadRemoteModule(
+    name,
+    url
+)
+
+    Log(
+        "Loading " ..
+        name ..
+        "..."
+    )
+
+
+    local ok,
+        source =
+        pcall(function()
+
+            return HttpGet(url)
+
+        end)
+
+
+    if not ok then
+
+        return false,
+            nil,
+            "Download gagal: " ..
+            tostring(source)
+
+    end
+
+
+    if type(source) ~= "string"
+        or source == "" then
+
+        return false,
+            nil,
+            name ..
+            " kosong."
+
+    end
+
+
+    local compileOK,
+        fn =
+        pcall(function()
+
+            local compiled,
+                compileError =
+                loadstring(source)
+
+
+            if not compiled then
+
+                error(
+                    tostring(
+                        compileError
+                    )
+                )
+
+            end
+
+
+            return compiled
+
+        end)
+
+
+    if not compileOK then
+
+        return false,
+            nil,
+            "Compile " ..
+            name ..
+            " gagal: " ..
+            tostring(fn)
+
+    end
+
+
+    return true,
+        fn,
+        nil
+
+end
+
+
+--========================================================--
+-- CONFIG CHECK
+--========================================================--
+
+if CONFIG.KEY_SYSTEM_URL ==
+    "ISI_RAW_URL_KEY_SYSTEM_V1_1_2_DI_SINI" then
+
+    LogError(
+        "KEY_SYSTEM_URL belum diisi."
+    )
+
+    return
+
+end
+
+
+if CONFIG.MAIN_SOURCE_URL ==
+    "ISI_RAW_URL_MAIN_DI_SINI" then
+
+    LogError(
+        "MAIN_SOURCE_URL belum diisi."
+    )
+
+    return
+
+end
+
+
+--========================================================--
+-- LOAD UI LIBRARY
+--========================================================--
+
+local uiOK,
+    uiLoader,
+    uiError =
+    LoadRemoteModule(
+        "UI Library",
+        CONFIG.UI_LIBRARY_URL
+    )
+
+
+if not uiOK then
+
+    LogError(uiError)
+
+    return
+
+end
+
+
+local uiRunOK,
+    UILibrary =
+    xpcall(
+
+        function()
+
+            return uiLoader()
+
+        end,
+
+        function(err)
+
+            return tostring(err)
+
+        end
+
+    )
+
+
+if not uiRunOK then
+
+    LogError(
+        "UI Library error: " ..
+        tostring(UILibrary)
+    )
+
+    return
+
+end
+
+
+if type(UILibrary) ~= "table" then
+
+    LogError(
+        "UI Library tidak valid."
+    )
+
+    return
+
+end
+
+
+Log(
+    "UI Library ready."
+)
+
+
+--========================================================--
+-- LOAD KEY SYSTEM
+--========================================================--
+
+local keyOK,
+    keyLoader,
+    keyError =
+    LoadRemoteModule(
+        "Key System",
+        CONFIG.KEY_SYSTEM_URL
+    )
+
+
+if not keyOK then
+
+    LogError(keyError)
+
+    return
+
+end
+
+
+local keyRunOK,
+    KeySystem =
+    xpcall(
+
+        function()
+
+            return keyLoader()
+
+        end,
+
+        function(err)
+
+            return tostring(err)
+
+        end
+
+    )
+
+
+if not keyRunOK then
+
+    LogError(
+        "Key System error: " ..
+        tostring(KeySystem)
+    )
+
+    return
+
+end
+
+
+if type(KeySystem) ~= "table" then
+
+    LogError(
+        "Key System tidak valid."
+    )
+
+    return
+
+end
+
+
+Log(
+    "Key System ready."
+)
+
+
+--========================================================--
+-- MAIN SOURCE
+--========================================================--
+
+local mainStarted = false
+
+
+local function StartMainSource()
+
+    if mainStarted then
+        return
+    end
+
+
+    mainStarted = true
+
+
+    Log(
+        "Key valid."
+    )
+
+    Log(
+        "Loading Main Source..."
+    )
+
+
+    local mainOK,
+        mainLoader,
+        mainError =
+        LoadRemoteModule(
+            "Main Source",
+            CONFIG.MAIN_SOURCE_URL
+        )
+
+
+    if not mainOK then
+
+        mainStarted = false
+
+        LogError(mainError)
+
+        return
+
+    end
+
+
+    Log(
+        "Main Source downloaded."
+    )
+
+
+    local executeOK,
+        result =
+        xpcall(
+
+            function()
+
+                return mainLoader()
+
+            end,
+
+            function(err)
+
+                return tostring(err)
+
+            end
+
+        )
+
+
+    if not executeOK then
+
+        mainStarted = false
+
+        LogError(
+            "Main Source error:"
+        )
+
+        LogError(result)
+
+        return
+
+    end
+
+
+    Log(
+        "Main Source started."
+    )
+
+end
+
+
+--========================================================--
+-- KEY SYSTEM UI
+--========================================================--
+
+local function StartKeyUI()
+
+    local gateOK,
+        gateResult =
+        pcall(function()
+
+            return KeySystem:Start({
+
+                UILibrary =
+                    UILibrary,
+
+                Title =
+                    CONFIG.KEY_TITLE,
+
+                Subtitle =
+                    CONFIG.KEY_SUBTITLE,
+
+                OnVerified =
+                    function(info)
+
+                        local enteredKey =
+                            info.key
+
+
+                        if not enteredKey then
+
+                            LogError(
+                                "Key valid tetapi key tidak dikembalikan oleh Key System."
+                            )
+
+                            return
+
+                        end
+
+
+                        SaveKey(
+                            enteredKey
+                        )
+
+
+                        Log(
+                            "KEY VERIFIED"
+                        )
+
+
+                        Log(
+                            "Action: " ..
+                            tostring(
+                                info.action
+                            )
+                        )
+
+
+                        Log(
+                            "Status: " ..
+                            tostring(
+                                info.status
+                            )
+                        )
+
+
+                        Log(
+                            "Expires: " ..
+                            tostring(
+                                info.expiresAt
+                            )
+                        )
+
+
+                        task.spawn(
+                            StartMainSource
+                        )
+
+                    end,
+
+                OnFailed =
+                    function(reason)
+
+                        LogError(
+                            "Key rejected: " ..
+                            tostring(reason)
+                        )
+
+                    end
+
+            })
+
+        end)
+
+
+    if not gateOK then
+
+        LogError(
+            "Key System gagal dijalankan:"
+        )
+
+        LogError(
+            gateResult
+        )
+
+        return false
+
+    end
+
+
+    return true
+
+end
+
+
+--========================================================--
+-- SAVED KEY VERIFICATION
+--========================================================--
+
+local function VerifySavedKey(
+    savedKey
+)
+
+    Log(
+        "Saved key ditemukan."
+    )
+
+    Log(
+        "Memverifikasi saved key..."
+    )
+
+
+    -- Key System sudah memuat fungsi private
+    -- untuk mengambil HWID dan mengirim verify.
+    --
+    -- Untuk menjaga satu sumber logika, kita gunakan
+    -- API publik KeySystem:Start() jika saved key
+    -- tersedia. Namun UI tidak perlu ditampilkan
+    -- bila key langsung valid.
+    --
+    -- Karena KeySystem v1.1.1 saat ini hanya
+    -- menyediakan Start() sebagai entry point UI,
+    -- kita lakukan verifikasi melalui temporary
+    -- Key System UI dengan key otomatis.
+    --
+    -- Implementasi di bawah membutuhkan API:
+    -- KeySystem:VerifySavedKey(key)
+    --
+    -- Jika API tersebut belum tersedia, fungsi
+    -- mengembalikan false dan loader menampilkan UI.
+
+    if type(
+        KeySystem.VerifySavedKey
+    ) ~= "function" then
+
+        Log(
+            "Key System belum menyediakan VerifySavedKey."
+        )
+
+        return false,
+            "unsupported"
+
+    end
+
+
+    -- VerifySavedKey mengembalikan 2 nilai:
+    --   1) valid  -> boolean
+    --   2) result -> table response server
+    --
+    -- pcall juga harus menangkap kedua return tersebut.
+    -- Sebelumnya hanya return pertama yang ditangkap,
+    -- sehingga "result" berisi boolean lalu kode mencoba
+    -- result.reason -> error "attempt to index boolean with 'reason'".
+
+    local ok,
+        valid,
+        result =
+        pcall(function()
+
+            return KeySystem:VerifySavedKey(
+                savedKey
+            )
+
+        end)
+
+
+    if not ok then
+
+        LogError(
+            "Saved key verification error: " ..
+            tostring(valid)
+        )
+
+        return false,
+            "error"
+
+    end
+
+
+    if valid ~= true then
+
+        local reason =
+            type(result) == "table"
+            and (
+                result.reason
+                or result.error
+            )
+            or "invalid"
+
+        return false,
+            tostring(reason)
+
+    end
+
+
+    if type(result) ~= "table" then
+
+        return false,
+            "invalid_response"
+
+    end
+
+
+    return true,
+        result
+
+end
+
+
+--========================================================--
+-- BOOT
+--========================================================--
+
+print("")
+print("==============================================")
+print("             PHILANX LOADER 1.4.3")
+print("==============================================")
+
+
+local savedKey =
+    ReadSavedKey()
+
+
+if savedKey then
+
+    local valid,
+        result =
+        VerifySavedKey(
+            savedKey
+        )
+
+
+    if valid then
+
+        Log(
+            "Saved key masih valid."
+        )
+
+        Log(
+            "Melewati Key UI."
+        )
+
+
+        task.spawn(
+            StartMainSource
+        )
+
+        return
+
+    end
+
+
+    local reason =
+        type(result) == "table"
+        and (
+            result.reason
+            or result.error
+        )
+        or result
+
+
+    Log(
+        "Saved key tidak valid: " ..
+        tostring(reason)
+    )
+
+
+    -- Expired, revoked, deleted, HWID mismatch,
+    -- atau key tidak lagi valid:
+    -- hapus file agar execute berikutnya
+    -- kembali meminta key.
+
+    DeleteSavedKey()
+
+end
+
+
+-- Tidak ada saved key valid.
+-- Tampilkan Key System.
+
+StartKeyUI()
