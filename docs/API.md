@@ -1,231 +1,287 @@
-# LIB-PHILANX UI Library --- API Documentation
+# LIB-PHILANX UI Library
 
-**Version:** 2.8.3\
-**Platform:** Roblox Studio / testing your own game\
-**Language:** Luau
+## API Reference --- Version 2.8.3
 
-> Dokumentasi ini dibuat berdasarkan implementasi
-> `LIB-PHILANX UI Library` yang digunakan saat ini. Nama method, option,
-> return value, dan perilaku di bawah mengikuti source library tersebut.
+Dokumentasi ini dibuat langsung berdasarkan source **LIB-PHILANX UI
+Library v2.8.3** yang diberikan.
+
+> **Penting:** dokumentasi ini hanya mendokumentasikan API yang
+> benar-benar ada di source. Jika sebuah opsi atau method tidak ada di
+> source, dokumentasi tidak akan menganggapnya tersedia.
 
 ------------------------------------------------------------------------
 
-## 1. Quick Start
+# 1. Quick Start
 
-Loader library dapat digunakan seperti ini:
+## Load Library
 
 ``` lua
 local UILibrary = loadstring(game:HttpGet("YOUR_LIBRARY_URL"))()
 ```
 
-Kemudian buat window:
+## Create Window
 
 ``` lua
 local Window = UILibrary:CreateWindow({
-    Title = "PHILANX HUB",
-    Subtitle = "Library Example",
+    Title = "My Game",
+    Subtitle = "My Script",
     Size = UDim2.fromOffset(650, 450),
-    Logo = "rbxassetid://132859114380485"
+    Logo = "rbxassetid://123456789"
 })
 ```
 
-> `Logo` menerima asset ID maupun string asset URL yang valid. Jika
-> nil/kosong, library menggunakan logo default PHILANX.
+## Create Tab
 
-Source menyediakan `CreateWindow(options)` dan default `Title`,
-`Subtitle`, `Size`, serta `Logo`.
+``` lua
+local MainTab = Window:CreateTab({
+    Name = "Main",
+    Icon = "★"
+})
+```
+
+## Create Section
+
+``` lua
+local MainSection = MainTab:CreateSection("General")
+```
+
+## Create Component
+
+``` lua
+MainSection:CreateButton({
+    Name = "Start",
+    Callback = function()
+        print("Started")
+    end
+})
+```
 
 ------------------------------------------------------------------------
 
-# 2. Library API
+# 2. API Structure
+
+Struktur utama library:
+
+``` text
+UILibrary
+└── Window
+    ├── Tabs
+    │   └── Sections
+    │       ├── Label
+    │       ├── Paragraph
+    │       ├── Divider
+    │       ├── StatusBox
+    │       ├── Button
+    │       ├── Toggle
+    │       ├── Input
+    │       ├── Dropdown
+    │       ├── Keybind
+    │       └── Slider
+    │
+    ├── Notification
+    ├── Config
+    └── Window Runtime API
+```
+
+------------------------------------------------------------------------
+
+# 3. Library
 
 ## `UILibrary:SetTheme(theme)`
 
-Mengubah warna theme yang tersedia.
+Mengubah nilai theme yang dikenali oleh library.
 
 ### Syntax
+
+``` lua
+UILibrary:SetTheme({
+    Accent = Color3.fromRGB(120, 90, 255)
+})
+```
+
+### Supported Theme Keys
+
+``` text
+Background
+Secondary
+Tertiary
+Accent
+Text
+SubText
+Border
+Success
+Warning
+Error
+```
+
+### Example
 
 ``` lua
 UILibrary:SetTheme({
     Background = Color3.fromRGB(8, 12, 22),
     Secondary = Color3.fromRGB(12, 18, 32),
     Tertiary = Color3.fromRGB(18, 27, 46),
+
     Accent = Color3.fromRGB(35, 155, 255),
+
     Text = Color3.fromRGB(245, 250, 255),
     SubText = Color3.fromRGB(145, 165, 190),
     Border = Color3.fromRGB(35, 65, 100),
+
     Success = Color3.fromRGB(70, 215, 140),
     Warning = Color3.fromRGB(255, 195, 70),
     Error = Color3.fromRGB(245, 85, 95)
 })
 ```
 
-### Theme keys
+### Important
 
-  Key            Tipe
-  -------------- ----------
-  `Background`   `Color3`
-  `Secondary`    `Color3`
-  `Tertiary`     `Color3`
-  `Accent`       `Color3`
-  `Text`         `Color3`
-  `SubText`      `Color3`
-  `Border`       `Color3`
-  `Success`      `Color3`
-  `Warning`      `Color3`
-  `Error`        `Color3`
-
-Key yang tidak dikenal akan diabaikan.
+`SetTheme()` mengubah shared `Theme` table. Source saat ini tidak
+menyediakan mekanisme lengkap untuk me-retint seluruh object UI yang
+sudah dibuat sebelumnya.
 
 ------------------------------------------------------------------------
 
-# 3. Window API
+# 4. Window
 
 ## `UILibrary:CreateWindow(options)`
 
-Membuat window utama.
+Membuat window utama library.
 
-### Options
+### Basic
 
 ``` lua
 local Window = UILibrary:CreateWindow({
-    Title = "PHILANX HUB",
-    Subtitle = "Library Example",
-    Size = UDim2.fromOffset(650, 450),
-    Logo = "rbxassetid://132859114380485"
+    Title = "My Game",
+    Subtitle = "My Script"
 })
 ```
 
-  -----------------------------------------------------------------------------------
-  Option            Tipe              Default                       Keterangan
-  ----------------- ----------------- ----------------------------- -----------------
-  `Title`           string            `"Apez UI"`                   Judul window
+### Full Example
 
-  `Subtitle`        string            `"UI Library"`                Subjudul
+``` lua
+local Window = UILibrary:CreateWindow({
+    Title = "MY GAME",
+    Subtitle = "Main Script",
+    Size = UDim2.fromOffset(650, 450),
+    Logo = "rbxassetid://123456789"
+})
+```
 
-  `Size`            `UDim2`           `UDim2.fromOffset(650,450)`   Ukuran window
+## Options
 
-  `Logo`            string/number     logo default                  Logo header dan
-                                                                    floating pill
-  -----------------------------------------------------------------------------------
+  Option       Type            Default                        Description
+  ------------ --------------- ------------------------------ -----------------
+  `Title`      string          `"Apez UI"`                    Judul window
+  `Subtitle`   string          `"UI Library"`                 Subjudul window
+  `Size`       UDim2           `UDim2.fromOffset(650, 450)`   Ukuran window
+  `Logo`       string/number   Logo PHILANX                   Logo window
+
+### Logo
+
+Asset ID angka akan otomatis diubah menjadi:
+
+``` lua
+Logo = 123456789
+```
+
+menjadi:
+
+``` lua
+Logo = "rbxassetid://123456789"
+```
+
+String asset juga dapat digunakan:
+
+``` lua
+Logo = "rbxassetid://123456789"
+```
 
 ------------------------------------------------------------------------
 
-## Window visibility
+# 5. Window Visibility
 
-### `Window:SetVisible(visible)`
-
-``` lua
-Window:SetVisible(true)
-Window:SetVisible(false)
-```
+## `Window:SetVisible(visible)`
 
 Menampilkan atau menyembunyikan window.
 
-------------------------------------------------------------------------
+``` lua
+Window:SetVisible(true)
+```
 
-### `Window:Toggle()`
+``` lua
+Window:SetVisible(false)
+```
+
+## `Window:Toggle()`
+
+Membalik status visibility.
 
 ``` lua
 Window:Toggle()
 ```
 
-Membalik status visibility window.
+## `Window:IsVisible()`
 
-------------------------------------------------------------------------
-
-### `Window:IsVisible()`
+Mengambil status visibility.
 
 ``` lua
 local visible = Window:IsVisible()
+
 print(visible)
 ```
 
-**Return:** `boolean`
-
 ------------------------------------------------------------------------
 
-# 4. Window Minimize API
+# 6. Window Minimize
 
 ## `Window:Minimize()`
+
+Meminimalkan window menjadi floating pill.
 
 ``` lua
 Window:Minimize()
 ```
 
-Meminimalkan window menjadi floating pill.
-
-------------------------------------------------------------------------
-
 ## `Window:Restore()`
+
+Mengembalikan window dari keadaan minimized.
 
 ``` lua
 Window:Restore()
 ```
 
-Mengembalikan window dari kondisi minimize.
-
-------------------------------------------------------------------------
-
 ## `Window:ToggleMinimize()`
+
+Toggle antara minimized dan normal.
 
 ``` lua
 Window:ToggleMinimize()
 ```
 
-Toggle antara minimize dan restore.
-
-------------------------------------------------------------------------
-
 ## `Window:IsMinimized()`
+
+Memeriksa apakah window sedang minimized.
 
 ``` lua
 local minimized = Window:IsMinimized()
-```
 
-**Return:** `boolean`
+print(minimized)
+```
 
 ------------------------------------------------------------------------
 
-## `Window:Destroy()`
-
-``` lua
-Window:Destroy()
-```
-
-Menghapus UI.
-
-------------------------------------------------------------------------
-
-# 5. Window Title / Logo API
+# 7. Window Title
 
 ## `Window:SetTitle(title)`
 
-``` lua
-Window:SetTitle("PHILANX HUB")
-```
-
-Mengubah title window dan title floating pill.
-
-------------------------------------------------------------------------
-
-## `Window:SetSubtitle(subtitle)`
+Mengubah judul window.
 
 ``` lua
-Window:SetSubtitle("My Game")
+Window:SetTitle("My New Game")
 ```
 
-------------------------------------------------------------------------
-
-## `Window:SetLogo(logo)`
-
-``` lua
-Window:SetLogo("rbxassetid://123456789")
-```
-
-Mengubah logo window dan floating pill.
-
-------------------------------------------------------------------------
+Judul pada floating pill juga ikut diperbarui.
 
 ## `Window:GetTitle()`
 
@@ -233,9 +289,11 @@ Mengubah logo window dan floating pill.
 local title = Window:GetTitle()
 ```
 
-**Return:** `string`
+## `Window:SetSubtitle(subtitle)`
 
-------------------------------------------------------------------------
+``` lua
+Window:SetSubtitle("Updated Script")
+```
 
 ## `Window:GetSubtitle()`
 
@@ -243,9 +301,23 @@ local title = Window:GetTitle()
 local subtitle = Window:GetSubtitle()
 ```
 
-**Return:** `string`
-
 ------------------------------------------------------------------------
+
+# 8. Window Logo
+
+## `Window:SetLogo(logo)`
+
+Mengubah logo window.
+
+``` lua
+Window:SetLogo("rbxassetid://123456789")
+```
+
+atau:
+
+``` lua
+Window:SetLogo(123456789)
+```
 
 ## `Window:GetLogo()`
 
@@ -253,54 +325,101 @@ local subtitle = Window:GetSubtitle()
 local logo = Window:GetLogo()
 ```
 
-**Return:** `string`
+------------------------------------------------------------------------
+
+# 9. Destroy Window
+
+## `Window:Destroy()`
+
+Menghapus seluruh ScreenGui library.
+
+``` lua
+Window:Destroy()
+```
+
+Setelah window dihancurkan, beberapa operasi runtime tidak lagi memiliki
+UI untuk dikontrol.
 
 ------------------------------------------------------------------------
 
-# 6. Tab API
+# 10. Tab
 
 ## `Window:CreateTab(options)`
 
-Membuat tab.
+Membuat tab baru.
+
+### Basic
+
+``` lua
+local MainTab = Window:CreateTab({
+    Name = "Main"
+})
+```
+
+### With Icon
 
 ``` lua
 local MainTab = Window:CreateTab({
     Name = "Main",
-    Icon = "🏠"
+    Icon = "★"
 })
 ```
 
-### Options
+## Options
 
-  Option   Tipe     Keterangan
-  -------- -------- ------------------------------------
+  Option   Type     Description
+  -------- -------- ---------------
   `Name`   string   Nama tab
-  `Icon`   string   Icon/text yang ditampilkan di kiri
+  `Icon`   string   Icon/text tab
 
-`Icon` bersifat opsional.
+### Multiple Tabs
+
+``` lua
+local MainTab = Window:CreateTab({
+    Name = "Main",
+    Icon = "★"
+})
+
+local SettingsTab = Window:CreateTab({
+    Name = "Settings",
+    Icon = "⚙"
+})
+
+local ConfigTab = Window:CreateTab({
+    Name = "Config",
+    Icon = "▣"
+})
+```
+
+> Tab pertama yang dibuat otomatis menjadi tab yang dipilih.
 
 ------------------------------------------------------------------------
 
-# 7. Section API
+# 11. Section
 
 ## `Tab:CreateSection(name)`
 
+Membuat section di dalam tab.
+
 ``` lua
-local Section = MainTab:CreateSection("Main Settings")
+local Section = MainTab:CreateSection("General")
 ```
 
-Section dapat di-collapse.
+Section bersifat collapsible.
 
 ------------------------------------------------------------------------
 
 ## `Section:SetCollapsed(value)`
 
+Collapse atau expand section.
+
 ``` lua
 Section:SetCollapsed(true)
-Section:SetCollapsed(false)
 ```
 
-------------------------------------------------------------------------
+``` lua
+Section:SetCollapsed(false)
+```
 
 ## `Section:Toggle()`
 
@@ -308,162 +427,257 @@ Section:SetCollapsed(false)
 Section:Toggle()
 ```
 
-------------------------------------------------------------------------
-
 ## `Section:IsCollapsed()`
 
 ``` lua
 local collapsed = Section:IsCollapsed()
 ```
 
-**Return:** `boolean`
+### Contoh
+
+``` lua
+local Settings = MainTab:CreateSection("Settings")
+
+Settings:SetCollapsed(true)
+
+task.wait(2)
+
+Settings:SetCollapsed(false)
+```
 
 ------------------------------------------------------------------------
 
-# 8. Label
+# 12. Label
 
 ## `Section:CreateLabel(text)`
 
 Membuat text label sederhana.
 
-``` lua
-Section:CreateLabel("PHILANX HUB")
-```
-
-### Return
-
-Mengembalikan object `TextLabel`.
-
-Contoh:
+### Syntax
 
 ``` lua
-local Label = Section:CreateLabel("Loading...")
-Label.Text = "Ready!"
+local Label = Section:CreateLabel("Hello World")
 ```
+
+### Example
+
+``` lua
+local StatusLabel = Section:CreateLabel(
+    "Status: Waiting..."
+)
+```
+
+### Returned Value
+
+Method ini mengembalikan Roblox `TextLabel`.
+
+Karena yang dikembalikan adalah instance `TextLabel`, property Roblox
+biasa dapat diakses:
+
+``` lua
+StatusLabel.Text = "Status: Ready!"
+```
+
+``` lua
+StatusLabel.TextSize = 14
+```
+
+### Kapan digunakan?
+
+Gunakan Label untuk:
+
+-   status singkat
+-   informasi satu baris
+-   teks biasa
+-   separator berbentuk teks
 
 ------------------------------------------------------------------------
 
-# 9. Paragraph
+# 13. Paragraph
+
+Paragraph cocok untuk informasi yang memiliki **judul +
+deskripsi/content**.
 
 ## `Section:CreateParagraph(options)`
 
-Membuat box informasi dengan title dan content.
+### Syntax
 
 ``` lua
 local Info = Section:CreateParagraph({
     Title = "Information",
-    Content = "Ini adalah contoh paragraph."
+    Content = "This is an information paragraph."
 })
 ```
 
-### Options
+## Options
 
-  Option      Tipe     Default
-  ----------- -------- -----------------
-  `Title`     string   `"Information"`
-  `Content`   string   `""`
+  Option      Type     Default           Description
+  ----------- -------- ----------------- ---------------
+  `Title`     string   `"Information"`   Judul
+  `Content`   string   `""`              Isi/deskripsi
 
-### API
-
-#### `Paragraph:SetTitle(title)`
+### Contoh
 
 ``` lua
-Info:SetTitle("Status")
+local Info = Section:CreateParagraph({
+    Title = "Auto Farm",
+    Content = "Mengaktifkan fitur auto farm akan menjalankan sistem farming secara otomatis."
+})
 ```
 
-#### `Paragraph:SetContent(content)`
+## Runtime API
+
+### `Paragraph:SetTitle(title)`
 
 ``` lua
-Info:SetContent("Library sudah aktif.")
+Info:SetTitle("New Information")
 ```
 
-#### `Paragraph:Set(text)`
+### `Paragraph:SetContent(content)`
 
 ``` lua
-Info:Set("Text baru")
+Info:SetContent(
+    "New description."
+)
+```
+
+### `Paragraph:Set(text)`
+
+Shortcut untuk mengubah content.
+
+``` lua
+Info:Set("Updated description.")
+```
+
+### Contoh Dynamic
+
+``` lua
+local Info = Section:CreateParagraph({
+    Title = "Status",
+    Content = "Loading..."
+})
+
+task.wait(2)
+
+Info:SetContent("Loaded successfully.")
 ```
 
 ------------------------------------------------------------------------
 
-# 10. Divider
+# 14. Divider
 
 ## `Section:CreateDivider()`
 
+Membuat garis pemisah visual.
+
 ``` lua
-Section:CreateDivider()
+local Divider = Section:CreateDivider()
 ```
 
-Membuat garis pemisah horizontal.
+Tidak memiliki option tambahan.
 
-**Return:** `Frame`
+### Contoh
+
+``` lua
+Section:CreateLabel("Player Settings")
+
+Section:CreateDivider()
+
+Section:CreateLabel("Game Settings")
+```
 
 ------------------------------------------------------------------------
 
-# 11. Status Box
+# 15. StatusBox
+
+StatusBox digunakan untuk menampilkan informasi dengan status visual.
 
 ## `Section:CreateStatusBox(options)`
 
-Membuat box status.
+### Syntax
 
 ``` lua
 local Status = Section:CreateStatusBox({
     Type = "success",
     Title = "Success",
-    Content = "Key berhasil diverifikasi."
+    Content = "Operation completed."
 })
 ```
 
-### Options
+## Options
 
-  Option      Tipe     Nilai
-  ----------- -------- ---------------------------------------
-  `Type`      string   `info`, `success`, `warning`, `error`
-  `Title`     string   default berdasarkan type
-  `Content`   string   `""`
+  Option      Type     Default            Description
+  ----------- -------- ------------------ --------------
+  `Type`      string   `"info"`           Jenis status
+  `Title`     string   uppercase status   Judul
+  `Content`   string   `""`               Deskripsi
 
-### Contoh semua type
+## Status Type
+
+``` text
+info
+success
+warning
+error
+```
+
+### Info
 
 ``` lua
 Section:CreateStatusBox({
     Type = "info",
-    Title = "INFO",
-    Content = "Informasi."
+    Title = "Information",
+    Content = "This is an information message."
 })
+```
 
+### Success
+
+``` lua
 Section:CreateStatusBox({
     Type = "success",
-    Title = "SUCCESS",
-    Content = "Berhasil."
+    Title = "Success",
+    Content = "Successfully completed."
 })
+```
 
+### Warning
+
+``` lua
 Section:CreateStatusBox({
     Type = "warning",
-    Title = "WARNING",
-    Content = "Perhatian."
+    Title = "Warning",
+    Content = "Please check your settings."
 })
+```
 
+### Error
+
+``` lua
 Section:CreateStatusBox({
     Type = "error",
-    Title = "ERROR",
-    Content = "Terjadi kesalahan."
+    Title = "Error",
+    Content = "Something went wrong."
 })
 ```
 
-### API
+## Runtime API
 
-#### `StatusBox:SetTitle(title)`
-
-``` lua
-Status:SetTitle("New Title")
-```
-
-#### `StatusBox:SetContent(content)`
+### `StatusBox:SetTitle(title)`
 
 ``` lua
-Status:SetContent("New content")
+Status:SetTitle("Updated")
 ```
 
-#### `StatusBox:SetType(type)`
+### `StatusBox:SetContent(content)`
+
+``` lua
+Status:SetContent(
+    "Updated status information."
+)
+```
+
+### `StatusBox:SetType(type)`
 
 ``` lua
 Status:SetType("warning")
@@ -471,12 +685,16 @@ Status:SetType("warning")
 
 ------------------------------------------------------------------------
 
-# 12. Button
+# 16. Button
+
+Button menjalankan callback ketika ditekan.
 
 ## `Section:CreateButton(options)`
 
+### Basic
+
 ``` lua
-Section:CreateButton({
+local Button = Section:CreateButton({
     Name = "Test Button",
 
     Callback = function()
@@ -485,34 +703,117 @@ Section:CreateButton({
 })
 ```
 
-### Options
+## Options
 
-  Option           Tipe       Keterangan
-  ---------------- ---------- -----------------------------------
-  `Name`           string     Text button
-  `Callback`       function   Dipanggil ketika button diklik
-  `ConfigIgnore`   boolean    Jika `true`, tidak dipakai config
-  `Id`             string     ID config jika diperlukan
+  -----------------------------------------------------------------------
+  Option            Type              Default           Description
+  ----------------- ----------------- ----------------- -----------------
+  `Name`            string            `"Button"`        Text button
+
+  `Callback`        function          nil               Function yang
+                                                        dipanggil ketika
+                                                        button ditekan
+  -----------------------------------------------------------------------
 
 ### Callback
 
-Button tidak mengirim argument.
+``` lua
+Section:CreateButton({
+    Name = "Start",
+
+    Callback = function()
+        print("Game started")
+    end
+})
+```
+
+## Description
+
+### Apakah Button mendukung `Desc` / `Description`?
+
+**Tidak pada source v2.8.3 yang diberikan.**
+
+Button saat ini hanya membuat satu text:
 
 ``` lua
-Callback = function()
-    print("Clicked")
+Text = options.Name or "Button"
+```
+
+dan callback:
+
+``` lua
+if options.Callback then
+    task.spawn(options.Callback)
 end
 ```
 
-### Return
+Jadi format seperti:
 
-Mengembalikan `TextButton`.
+``` lua
+Desc = "Test Button"
+```
+
+atau:
+
+``` lua
+Description = "Test Button"
+```
+
+**belum merupakan API Button pada v2.8.3.**
+
+Begitu juga method berikut **tidak tersedia** pada Button saat ini:
+
+``` lua
+Button:SetDesc(...)
+Button:SetDescription(...)
+```
+
+### Jika membutuhkan deskripsi
+
+Gunakan Paragraph sebelum Button:
+
+``` lua
+Section:CreateParagraph({
+    Title = "Start Game",
+    Content = "Menjalankan game dari awal."
+})
+
+Section:CreateButton({
+    Name = "Start",
+    Callback = function()
+        print("Game started")
+    end
+})
+```
+
+Ini sesuai dengan component yang memang tersedia di library.
+
+### Returned Value
+
+Button mengembalikan Roblox `TextButton`.
+
+``` lua
+local Button = Section:CreateButton({
+    Name = "Test"
+})
+```
+
+Karena returned value adalah `TextButton`, property Roblox dapat
+digunakan:
+
+``` lua
+Button.Text = "New Text"
+```
 
 ------------------------------------------------------------------------
 
-# 13. Toggle
+# 17. Toggle
+
+Toggle digunakan untuk nilai boolean `true` / `false`.
 
 ## `Section:CreateToggle(options)`
+
+### Basic
 
 ``` lua
 local AutoFarm = Section:CreateToggle({
@@ -525,162 +826,247 @@ local AutoFarm = Section:CreateToggle({
 })
 ```
 
-### Options
+## Options
 
-  Option           Tipe       Default
-  ---------------- ---------- ------------
-  `Name`           string     `"Toggle"`
-  `Default`        boolean    `false`
-  `Callback`       function   nil
-  `Id`             string     `Name`
-  `ConfigIgnore`   boolean    `false`
+  -----------------------------------------------------------------------
+  Option            Type              Default           Description
+  ----------------- ----------------- ----------------- -----------------
+  `Name`            string            `"Toggle"`        Nama toggle
 
-### Callback
+  `Default`         boolean           `false`           Nilai awal
+
+  `Callback`        function          nil               Dipanggil ketika
+                                                        nilai berubah
+
+  `Id`              string            `Name`            ID config
+
+  `ConfigIgnore`    boolean           `false`           Tidak didaftarkan
+                                                        ke config jika
+                                                        true
+  -----------------------------------------------------------------------
+
+## Callback
+
+Callback menerima nilai boolean.
 
 ``` lua
 Callback = function(enabled)
     if enabled then
-        print("ON")
+        print("Enabled")
     else
-        print("OFF")
+        print("Disabled")
     end
 end
 ```
 
-### API
+## Runtime API
 
-#### `Toggle:Set(value, fireCallback)`
+### `Toggle:Set(value, fireCallback)`
 
 ``` lua
 AutoFarm:Set(true)
+```
+
+``` lua
 AutoFarm:Set(false)
 ```
 
-Untuk tidak menjalankan callback:
+Untuk mengubah tanpa menjalankan callback:
 
 ``` lua
 AutoFarm:Set(true, false)
 ```
 
-------------------------------------------------------------------------
-
-#### `Toggle:Get()`
+### `Toggle:Get()`
 
 ``` lua
 local enabled = AutoFarm:Get()
 ```
 
-**Return:** `boolean`
-
-------------------------------------------------------------------------
-
-#### `Toggle:SetTitle(title)`
+### `Toggle:SetTitle(title)`
 
 ``` lua
 AutoFarm:SetTitle("Auto Farm v2")
 ```
 
-------------------------------------------------------------------------
-
-#### `Toggle:SetVisible(visible)`
+### `Toggle:SetVisible(visible)`
 
 ``` lua
 AutoFarm:SetVisible(false)
+```
+
+``` lua
 AutoFarm:SetVisible(true)
+```
+
+## Game Example
+
+``` lua
+local AutoFarmEnabled = false
+
+local AutoFarm = Section:CreateToggle({
+    Name = "Auto Farm",
+    Id = "AutoFarm",
+    Default = false,
+
+    Callback = function(value)
+        AutoFarmEnabled = value
+    end
+})
+```
+
+Game logic:
+
+``` lua
+if AutoFarmEnabled then
+    -- Auto Farm logic
+end
 ```
 
 ------------------------------------------------------------------------
 
-# 14. Input
+# 18. Input
+
+Input menggunakan Roblox `TextBox`.
 
 ## `Section:CreateInput(options)`
 
-Input adalah `TextBox`.
+### Basic
+
+``` lua
+local Input = Section:CreateInput({
+    Placeholder = "Enter text...",
+    Default = ""
+})
+```
+
+### Full
 
 ``` lua
 local Username = Section:CreateInput({
-    Placeholder = "Masukkan username...",
-    Default = "",
+    Name = "Username",
+    Placeholder = "Enter username...",
+    Default = "Player",
 
     Callback = function(text, enterPressed)
-        print(text)
+        print("Text:", text)
         print("Enter:", enterPressed)
     end
 })
 ```
 
-### Options
+## Options
 
-  Option           Tipe       Default
-  ---------------- ---------- -----------------------
-  `Placeholder`    string     `"Enter text..."`
-  `Default`        string     `""`
-  `Callback`       function   nil
-  `Id`             string     `Name` jika diberikan
-  `ConfigIgnore`   boolean    `false`
+  -------------------------------------------------------------------------
+  Option            Type              Default             Description
+  ----------------- ----------------- ------------------- -----------------
+  `Name`            string            ---                 Diteruskan
+                                                          sebagai ID config
+                                                          jika tidak ada
+                                                          `Id`
 
-### Callback
+  `Placeholder`     string            `"Enter text..."`   Placeholder
+                                                          TextBox
 
-Callback dipanggil ketika TextBox kehilangan focus.
+  `Default`         string            `""`                Text awal
+
+  `Callback`        function          nil                 Dipanggil ketika
+                                                          FocusLost
+
+  `Id`              string            `Name`              ID config
+
+  `ConfigIgnore`    boolean           `false`             Abaikan config
+  -------------------------------------------------------------------------
+
+> `Name` saat ini tidak digunakan sebagai label visual terpisah pada
+> TextBox. Ia terutama berguna sebagai fallback ID config.
+
+## Callback
+
+Callback menerima:
 
 ``` lua
 Callback = function(text, enterPressed)
-    print("Text:", text)
-    print("Enter pressed:", enterPressed)
+    print(text)
+    print(enterPressed)
 end
 ```
 
-### Return
+`enterPressed` menunjukkan apakah focus hilang karena tombol Enter.
 
-`CreateInput()` mengembalikan object `TextBox`.
+## Returned Value
+
+Input mengembalikan Roblox `TextBox`.
 
 ``` lua
 local Input = Section:CreateInput({
-    Placeholder = "Text..."
+    Placeholder = "Type..."
 })
+```
 
-Input.Text = "Hello"
+### Read Value
+
+``` lua
 print(Input.Text)
 ```
 
-> Catatan: implementasi saat ini menggunakan `Box.Text` untuk
-> membaca/menyimpan nilai input. Karena itu input tidak memakai API
-> `Get()`/`Set()` seperti Toggle.
+### Set Value
+
+``` lua
+Input.Text = "Hello"
+```
+
+## Game Example
+
+``` lua
+local PlayerName = Section:CreateInput({
+    Name = "PlayerName",
+    Placeholder = "Player name...",
+    Default = ""
+})
+
+Section:CreateButton({
+    Name = "Print Name",
+
+    Callback = function()
+        print("Selected:", PlayerName.Text)
+    end
+})
+```
 
 ------------------------------------------------------------------------
 
-# 15. Dropdown
-
-## `Section:CreateDropdown(options)`
+# 19. Dropdown
 
 Dropdown mendukung:
 
--   Single select
--   Multi select
+-   Single selection
+-   Multi selection
 -   Search
 -   Maximum selected item
+-   Dynamic option
+-   Runtime value changes
+-   Config
+
+## `Section:CreateDropdown(options)`
 
 ------------------------------------------------------------------------
 
-## 15.1 Single Dropdown
+## Single Dropdown
 
 ``` lua
 local Mode = Section:CreateDropdown({
-    Name = "Mode",
+    Name = "Game Mode",
 
     Values = {
+        "Easy",
         "Normal",
-        "Fast",
-        "Extreme"
+        "Hard"
     },
 
     Default = "Normal",
-
     Multi = false,
-
     Search = true,
-
-    SearchPlaceholder = "Search mode...",
 
     Callback = function(value)
         print("Selected:", value)
@@ -688,104 +1074,124 @@ local Mode = Section:CreateDropdown({
 })
 ```
 
-### Options
+## Options
 
-  Option                Tipe          Default
-  --------------------- ------------- ---------------------------
-  `Name`                string        `"Dropdown"`
-  `Values`              table         `{}`
-  `Default`             value/table   item pertama untuk single
-  `Multi`               boolean       `false`
-  `Search`              boolean       `true`
-  `SearchPlaceholder`   string        `"Search..."`
-  `MaxSelected`         number        nil
-  `Callback`            function      nil
-  `Id`                  string        `Name`
-  `ConfigIgnore`        boolean       `false`
+  -----------------------------------------------------------------------------
+  Option                  Type              Default           Description
+  ----------------------- ----------------- ----------------- -----------------
+  `Name`                  string            `"Dropdown"`      Nama dropdown
 
-------------------------------------------------------------------------
+  `Values`                table             `{}`              Daftar option
 
-## 15.2 Multi Dropdown
+  `Default`               value/table       first value untuk Nilai awal
+                                            single            
 
-``` lua
-local Features = Section:CreateDropdown({
-    Name = "Features",
+  `Multi`                 boolean           `false`           Multi-select
 
-    Values = {
-        "Auto Farm",
-        "Auto Collect",
-        "ESP",
-        "Speed"
-    },
+  `Search`                boolean           `true`            Search box
 
-    Default = {
-        "Auto Farm",
-        "ESP"
-    },
+  `SearchPlaceholder`     string            `"Search..."`     Placeholder
+                                                              search
 
-    Multi = true,
+  `MaxSelected`           number            nil               Batas pilihan
+                                                              untuk multi
 
-    MaxSelected = 3,
+  `MaxSelectedCallback`   function          nil               Dipanggil saat
+                                                              batas tercapai
 
-    Callback = function(values)
-        for _, value in ipairs(values) do
-            print(value)
-        end
-    end
-})
-```
+  `Callback`              function          nil               Callback pilihan
 
-Callback multi dropdown menerima table.
+  `Id`                    string            `Name`            ID config
+
+  `ConfigIgnore`          boolean           `false`           Abaikan config
+  -----------------------------------------------------------------------------
 
 ------------------------------------------------------------------------
 
-## 15.3 `Dropdown:Get()`
+# 20. Dropdown Default
+
+## Single
 
 ``` lua
-local value = Mode:Get()
+Default = "Normal"
 ```
 
-Single:
+Jika `Default` tidak diberikan, single dropdown menggunakan item
+pertama:
 
 ``` lua
-print(value)
+Values = {
+    "Easy",
+    "Normal",
+    "Hard"
+}
 ```
 
-Multi:
+maka default:
+
+``` text
+Easy
+```
+
+## Multi
+
+Default dapat berupa table:
 
 ``` lua
-local values = Features:Get()
+Default = {
+    "ESP",
+    "Speed"
+}
+```
 
-for _, value in ipairs(values) do
+Atau satu nilai:
+
+``` lua
+Default = "ESP"
+```
+
+Hanya nilai yang terdapat di `Values` yang akan digunakan sebagai
+default.
+
+------------------------------------------------------------------------
+
+# 21. Dropdown Callback
+
+## Single
+
+Callback menerima selected value:
+
+``` lua
+Callback = function(value)
     print(value)
+end
+```
+
+## Multi
+
+Callback menerima table:
+
+``` lua
+Callback = function(values)
+    for _, value in ipairs(values) do
+        print(value)
+    end
 end
 ```
 
 ------------------------------------------------------------------------
 
-## 15.4 `Dropdown:GetValue()`
+# 22. Dropdown Runtime API
+
+## `Dropdown:Set(value, fireCallback)`
+
+Single:
 
 ``` lua
-local value = Mode:GetValue()
+Mode:Set("Hard")
 ```
 
-Untuk multi dropdown, return berupa table.
-
-------------------------------------------------------------------------
-
-## 15.5 `Dropdown:Set(value, fireCallback)`
-
-``` lua
-Mode:Set("Fast")
-```
-
-Tanpa callback:
-
-``` lua
-Mode:Set("Fast", false)
-```
-
-Untuk multi:
+Multi:
 
 ``` lua
 Features:Set({
@@ -794,131 +1200,190 @@ Features:Set({
 })
 ```
 
-------------------------------------------------------------------------
-
-## 15.6 `Dropdown:SetValue(value, fireCallback)`
+## `Dropdown:Get()`
 
 ``` lua
-Mode:SetValue("Extreme")
+local value = Mode:Get()
 ```
 
-Multi:
+## `Dropdown:SetVisible(visible)`
+
+``` lua
+Mode:SetVisible(false)
+```
+
+## `Dropdown:SetTitle(title)`
+
+``` lua
+Mode:SetTitle("Difficulty")
+```
+
+## `Dropdown:IsMulti()`
+
+``` lua
+print(Mode:IsMulti())
+```
+
+## `Dropdown:GetValue()`
+
+``` lua
+local value = Mode:GetValue()
+```
+
+------------------------------------------------------------------------
+
+# 23. Dropdown `SetValue`
+
+## Single
+
+``` lua
+Mode:SetValue("Hard")
+```
+
+## Multi
 
 ``` lua
 Features:SetValue({
-    "Auto Farm",
-    "ESP"
+    "ESP",
+    "Jump"
 })
 ```
 
-------------------------------------------------------------------------
-
-## 15.7 `Dropdown:IsMulti()`
+## Disable Callback
 
 ``` lua
-if Features:IsMulti() then
-    print("Multi dropdown")
-end
+Mode:SetValue("Hard", false)
 ```
 
-**Return:** `boolean`
+`fireCallback = false` mencegah callback dipanggil.
 
 ------------------------------------------------------------------------
 
-## 15.8 `Dropdown:SelectAll(fireCallback)`
+# 24. Multi Dropdown API
 
-Hanya untuk multi dropdown.
+## `SelectAll()`
+
+Memilih semua option yang tersedia.
 
 ``` lua
 Features:SelectAll()
 ```
 
-------------------------------------------------------------------------
+## `DeselectAll()`
 
-## 15.9 `Dropdown:DeselectAll(fireCallback)`
+Membatalkan semua pilihan.
 
 ``` lua
 Features:DeselectAll()
 ```
 
-------------------------------------------------------------------------
+## `ClearSelection()`
 
-## 15.10 `Dropdown:ClearSelection(fireCallback)`
-
-Alias untuk `DeselectAll`.
+Mengosongkan selection.
 
 ``` lua
 Features:ClearSelection()
 ```
 
+Ketiga method tersebut menerima optional:
+
+``` lua
+Features:SelectAll(false)
+Features:DeselectAll(false)
+Features:ClearSelection(false)
+```
+
 ------------------------------------------------------------------------
 
-## 15.11 `Dropdown:GetMaxSelected()`
+# 25. Dropdown Maximum Selection
+
+## `GetMaxSelected()`
 
 ``` lua
 local max = Features:GetMaxSelected()
 ```
 
-------------------------------------------------------------------------
-
-## 15.12 `Dropdown:SetMaxSelected(limit)`
+## `SetMaxSelected(limit)`
 
 ``` lua
-Features:SetMaxSelected(2)
+Features:SetMaxSelected(3)
 ```
 
-Untuk menghapus batas:
+Menghapus batas:
 
 ``` lua
 Features:SetMaxSelected(nil)
 ```
 
-------------------------------------------------------------------------
-
-## 15.13 `Dropdown:AddOption(item)`
+### Example
 
 ``` lua
-Mode:AddOption("Ultra")
+local Features = Section:CreateDropdown({
+    Name = "Features",
+
+    Values = {
+        "ESP",
+        "Speed",
+        "Jump",
+        "Auto Farm"
+    },
+
+    Multi = true,
+    MaxSelected = 2
+})
 ```
 
-**Return:** `true` jika berhasil, `false` jika gagal.
-
-------------------------------------------------------------------------
-
-## 15.14 `Dropdown:RemoveOption(item)`
+Jika user mencoba memilih lebih dari batas, `MaxSelectedCallback` dapat
+digunakan.
 
 ``` lua
-Mode:RemoveOption("Ultra")
+MaxSelectedCallback = function(limit)
+    print("Maximum:", limit)
+end
 ```
-
-**Return:** `boolean`
 
 ------------------------------------------------------------------------
 
-## 15.15 `Dropdown:SetValues(values, fireCallback)`
+# 26. Dropdown Dynamic Options
+
+## `AddOption(item)`
+
+``` lua
+Features:AddOption("Auto Collect")
+```
+
+Jika option sudah ada, tidak ditambahkan ulang.
+
+## `RemoveOption(item)`
+
+``` lua
+Features:RemoveOption("Auto Collect")
+```
+
+## `SetValues(values, fireCallback)`
 
 Mengganti seluruh daftar option.
 
 ``` lua
-Mode:SetValues({
-    "Normal",
-    "Fast",
-    "Extreme",
-    "Ultra"
+Features:SetValues({
+    "Option A",
+    "Option B",
+    "Option C"
 })
 ```
 
-------------------------------------------------------------------------
-
-## 15.16 `Dropdown:Clear(fireCallback)`
-
-Menghapus selection.
+Tanpa callback:
 
 ``` lua
-Mode:Clear()
+Features:SetValues({
+    "A",
+    "B"
+}, false)
 ```
 
-Multi:
+## `Clear(fireCallback)`
+
+Menghapus selection.
 
 ``` lua
 Features:Clear()
@@ -926,87 +1391,158 @@ Features:Clear()
 
 ------------------------------------------------------------------------
 
-## 15.17 Search API
+# 27. Dropdown Search
 
-### `Dropdown:SetSearch(text)`
+Search aktif secara default.
+
+## Disable Search
 
 ``` lua
-Mode:SetSearch("fast")
+Search = false
 ```
 
-### `Dropdown:GetSearch()`
+## Custom Placeholder
 
 ``` lua
-print(Mode:GetSearch())
+SearchPlaceholder = "Search feature..."
 ```
 
-### `Dropdown:ClearSearch()`
+## `SetSearch(text)`
 
 ``` lua
-Mode:ClearSearch()
+Features:SetSearch("ESP")
 ```
 
-------------------------------------------------------------------------
-
-## 15.18 Dropdown display API
-
-### `Dropdown:SetTitle(title)`
+## `GetSearch()`
 
 ``` lua
-Mode:SetTitle("Farm Mode")
+local search = Features:GetSearch()
 ```
 
-### `Dropdown:SetVisible(visible)`
+## `ClearSearch()`
 
 ``` lua
-Mode:SetVisible(false)
-Mode:SetVisible(true)
+Features:ClearSearch()
 ```
 
 ------------------------------------------------------------------------
 
-# 16. Keybind
-
-## `Section:CreateKeybind(options)`
+# 28. Complete Multi Dropdown Example
 
 ``` lua
-local ToggleKey = Section:CreateKeybind({
-    Name = "Toggle UI",
+local Features = Section:CreateDropdown({
+    Name = "Features",
 
-    Default = Enum.KeyCode.RightShift,
+    Values = {
+        "ESP",
+        "Speed",
+        "Jump",
+        "Auto Farm",
+        "Auto Collect"
+    },
 
-    Changed = function(key)
-        print("Key changed:", key.Name)
+    Default = {
+        "ESP"
+    },
+
+    Multi = true,
+    Search = true,
+    SearchPlaceholder = "Search feature...",
+    MaxSelected = 3,
+
+    Callback = function(values)
+        print("Selected features:")
+
+        for _, value in ipairs(values) do
+            print("-", value)
+        end
     end,
 
-    Callback = function(key)
-        print("Key pressed:", key.Name)
+    MaxSelectedCallback = function(limit)
+        print("Maximum selected:", limit)
     end
 })
 ```
 
-### Options
+------------------------------------------------------------------------
 
-  Option           Tipe             Keterangan
-  ---------------- ---------------- -------------------------------
-  `Name`           string           Nama keybind
-  `Default`        `Enum.KeyCode`   Default `RightShift`
-  `Changed`        function         Dipanggil saat keybind diubah
-  `Callback`       function         Dipanggil saat key ditekan
-  `Id`             string           ID config
-  `ConfigIgnore`   boolean          Ignore config jika `true`
+# 29. Keybind
 
-### API
+Keybind digunakan untuk memilih keyboard key.
 
-#### `Keybind:Set(key)`
+## `Section:CreateKeybind(options)`
+
+### Basic
+
+``` lua
+local ToggleKey = Section:CreateKeybind({
+    Name = "Toggle UI",
+    Default = Enum.KeyCode.RightShift,
+
+    Callback = function(key)
+        print("Pressed:", key.Name)
+    end,
+
+    Changed = function(key)
+        print("Changed:", key.Name)
+    end
+})
+```
+
+## Options
+
+  Option           Type           Default        Description
+  ---------------- -------------- -------------- ------------------------------
+  `Name`           string         `"Keybind"`    Nama
+  `Default`        Enum.KeyCode   `RightShift`   Key awal
+  `Callback`       function       nil            Dipanggil ketika key ditekan
+  `Changed`        function       nil            Dipanggil ketika key berubah
+  `Id`             string         `Name`         ID config
+  `ConfigIgnore`   boolean        `false`        Abaikan config
+
+------------------------------------------------------------------------
+
+# 30. Keybind Callback
+
+``` lua
+Callback = function(key)
+    print("Pressed:", key.Name)
+end
+```
+
+Keybind akan menjalankan callback ketika:
+
+``` lua
+input.KeyCode == CurrentKey
+```
+
+dan input merupakan keyboard input.
+
+------------------------------------------------------------------------
+
+# 31. Keybind Changed
+
+``` lua
+Changed = function(key)
+    print("New key:", key.Name)
+end
+```
+
+Callback `Changed` dipanggil ketika user mengganti key.
+
+------------------------------------------------------------------------
+
+# 32. Keybind Runtime API
+
+## `Keybind:Set(key)`
 
 ``` lua
 ToggleKey:Set(Enum.KeyCode.F)
 ```
 
-------------------------------------------------------------------------
+Hanya `Enum.KeyCode` yang valid.
 
-#### `Keybind:Get()`
+## `Keybind:Get()`
 
 ``` lua
 local key = ToggleKey:Get()
@@ -1014,27 +1550,29 @@ local key = ToggleKey:Get()
 print(key.Name)
 ```
 
-**Return:** `Enum.KeyCode`
-
-------------------------------------------------------------------------
-
-### Menggunakan keybind
-
-User dapat klik element keybind, lalu menekan keyboard key baru.
-
-Ketika key yang tersimpan ditekan, `Callback` akan dipanggil.
+### Example
 
 ``` lua
-Callback = function(key)
-    Window:Toggle()
-end
+local ToggleKey = Section:CreateKeybind({
+    Name = "Toggle UI",
+    Id = "ToggleUI",
+    Default = Enum.KeyCode.RightShift,
+
+    Callback = function()
+        Window:Toggle()
+    end
+})
 ```
 
 ------------------------------------------------------------------------
 
-# 17. Slider
+# 33. Slider
+
+Slider digunakan untuk nilai numerik.
 
 ## `Section:CreateSlider(options)`
+
+### Basic
 
 ``` lua
 local Speed = Section:CreateSlider({
@@ -1042,8 +1580,26 @@ local Speed = Section:CreateSlider({
 
     Min = 0,
     Max = 100,
-    Step = 5,
     Default = 50,
+
+    Callback = function(value)
+        print("Speed:", value)
+    end
+})
+```
+
+## Full
+
+``` lua
+local Speed = Section:CreateSlider({
+    Name = "Speed",
+    Id = "Speed",
+
+    Min = 0,
+    Max = 100,
+
+    Default = 50,
+    Step = 5,
     Decimals = 0,
 
     Callback = function(value)
@@ -1052,46 +1608,107 @@ local Speed = Section:CreateSlider({
 })
 ```
 
-### Options
+## Options
 
-  Option              Tipe         Default
-  ------------------- ------------ ------------
-  `Name`              string       `"Slider"`
-  `Min` / `Minimum`   number       `0`
-  `Max` / `Maximum`   number       `100`
-  `Step`              number       `1`
-  `Decimals`          number/nil   nil
-  `Default`           number       minimum
-  `Callback`          function     nil
-  `Id`                string       `Name`
-  `ConfigIgnore`      boolean      `false`
+  Option           Type         Default      Description
+  ---------------- ------------ ------------ ----------------
+  `Name`           string       `"Slider"`   Nama
+  `Min`            number       `0`          Minimum
+  `Minimum`        number       `0`          Alias minimum
+  `Max`            number       `100`        Maximum
+  `Maximum`        number       `100`        Alias maximum
+  `Default`        number       minimum      Nilai awal
+  `Step`           number       `1`          Increment
+  `Decimals`       number/nil   nil          Jumlah desimal
+  `Callback`       function     nil          Callback value
+  `Id`             string       `Name`       ID config
+  `ConfigIgnore`   boolean      `false`      Abaikan config
 
-### Step
+------------------------------------------------------------------------
 
-Contoh:
+# 34. Slider Min / Max
+
+Keduanya tersedia:
 
 ``` lua
-Min = 0,
-Max = 100,
+Min = 0
+Max = 100
+```
+
+atau:
+
+``` lua
+Minimum = 0
+Maximum = 100
+```
+
+Jika maximum lebih kecil daripada minimum, library menukar keduanya.
+
+------------------------------------------------------------------------
+
+# 35. Slider Step
+
+Step digunakan pada perhitungan value.
+
+``` lua
+Min = 0
+Max = 100
 Step = 5
 ```
 
-Nilai yang valid:
+Maka value akan mengikuti:
 
 ``` text
 0
 5
 10
 15
+20
 ...
 100
 ```
 
+Contoh:
+
+``` lua
+local Speed = Section:CreateSlider({
+    Name = "Speed",
+    Min = 0,
+    Max = 100,
+    Step = 5,
+    Default = 50
+})
+```
+
 ------------------------------------------------------------------------
 
-## Slider API
+# 36. Slider Decimals
 
-### `Slider:Set(value, fireCallback)`
+``` lua
+Decimals = 2
+```
+
+Contoh:
+
+``` lua
+local Multiplier = Section:CreateSlider({
+    Name = "Multiplier",
+
+    Min = 0,
+    Max = 5,
+
+    Step = 0.1,
+    Decimals = 2,
+
+    Default = 1
+})
+```
+
+------------------------------------------------------------------------
+
+# 37. Slider Runtime API
+
+## `Slider:Set(value, fireCallback)`
 
 ``` lua
 Speed:Set(75)
@@ -1103,25 +1720,19 @@ Tanpa callback:
 Speed:Set(75, false)
 ```
 
-------------------------------------------------------------------------
-
-### `Slider:SetValue(value, fireCallback)`
+## `Slider:SetValue(value, fireCallback)`
 
 ``` lua
 Speed:SetValue(80)
 ```
 
-------------------------------------------------------------------------
-
-### `Slider:Get()`
+## `Slider:Get()`
 
 ``` lua
 local value = Speed:Get()
 ```
 
-------------------------------------------------------------------------
-
-### `Slider:GetValue()`
+## `Slider:GetValue()`
 
 ``` lua
 local value = Speed:GetValue()
@@ -1129,221 +1740,220 @@ local value = Speed:GetValue()
 
 ------------------------------------------------------------------------
 
-### `Slider:SetMin(minimum, fireCallback)`
+# 38. Slider Limits Runtime
+
+## `SetMin`
 
 ``` lua
 Speed:SetMin(10)
 ```
 
-------------------------------------------------------------------------
+## `GetMin`
 
-### `Slider:SetMax(maximum, fireCallback)`
+``` lua
+local min = Speed:GetMin()
+```
+
+## `SetMax`
 
 ``` lua
 Speed:SetMax(200)
 ```
 
-------------------------------------------------------------------------
+## `GetMax`
 
-### `Slider:SetStep(step, fireCallback)`
+``` lua
+local max = Speed:GetMax()
+```
+
+## `SetStep`
 
 ``` lua
 Speed:SetStep(10)
 ```
 
-------------------------------------------------------------------------
-
-### `Slider:GetMin()`
+## `GetStep`
 
 ``` lua
-print(Speed:GetMin())
+local step = Speed:GetStep()
 ```
 
-------------------------------------------------------------------------
-
-### `Slider:GetMax()`
-
-``` lua
-print(Speed:GetMax())
-```
-
-------------------------------------------------------------------------
-
-### `Slider:GetStep()`
-
-``` lua
-print(Speed:GetStep())
-```
-
-------------------------------------------------------------------------
-
-### `Slider:SetDecimals(decimals, fireCallback)`
+## `SetDecimals`
 
 ``` lua
 Speed:SetDecimals(2)
 ```
 
-Contoh:
-
-``` text
-10.00
-10.25
-10.50
-10.75
-```
-
-------------------------------------------------------------------------
-
-### `Slider:GetDecimals()`
+## `GetDecimals`
 
 ``` lua
-print(Speed:GetDecimals())
+local decimals = Speed:GetDecimals()
 ```
 
 ------------------------------------------------------------------------
 
-### `Slider:SetTitle(title)`
+# 39. Slider UI Runtime
+
+## `SetTitle`
 
 ``` lua
-Speed:SetTitle("Farm Speed")
+Speed:SetTitle("Walk Speed")
 ```
 
-------------------------------------------------------------------------
-
-### `Slider:SetVisible(visible)`
+## `SetVisible`
 
 ``` lua
 Speed:SetVisible(false)
+```
+
+``` lua
 Speed:SetVisible(true)
 ```
 
 ------------------------------------------------------------------------
 
-# 18. Notification
+# 40. Notification
+
+Notification dibuat melalui Window.
 
 ## `Window:Notify(options)`
 
-Membuat notification di kanan bawah.
+### Basic
 
 ``` lua
 Window:Notify({
     Title = "Success",
-    Content = "Setting berhasil disimpan.",
+    Content = "Game started!",
     Duration = 3
 })
 ```
 
-### Options
+## Options
 
-  Option       Tipe       Default
-  ------------ ---------- ------------------
-  `Title`      string     `"Notification"`
-  `Content`    string     `""`
-  `Duration`   number     `3`
-  `Color`      `Color3`   Theme Accent
+  Option       Type     Default            Description
+  ------------ -------- ------------------ ---------------
+  `Title`      string   `"Notification"`   Judul
+  `Content`    string   `""`               Isi/deskripsi
+  `Duration`   number   `3`                Durasi
+  `Color`      Color3   `Theme.Accent`     Warna accent
 
-### Contoh warna
+### Custom Color
 
 ``` lua
 Window:Notify({
-    Title = "Success",
-    Content = "Berhasil!",
+    Title = "Warning",
+    Content = "Low health!",
     Duration = 3,
-    Color = Color3.fromRGB(70, 215, 140)
+    Color = Color3.fromRGB(255, 195, 70)
 })
 ```
 
-Return berupa notification `Frame`.
+### Returned Value
+
+`Window:Notify()` mengembalikan Roblox `Frame` notification.
 
 ------------------------------------------------------------------------
 
-# 19. Config System
+# 41. Config System
 
-Config system terintegrasi langsung dengan component.
+Config system menyimpan state dari component yang terdaftar.
 
-Component yang dapat diregistrasikan ke config:
+Component yang mendukung config:
 
--   Toggle
--   Input
--   Dropdown
--   Keybind
--   Slider
+``` text
+Toggle
+Input
+Dropdown
+Keybind
+Slider
+```
 
-Button tidak memiliki state yang perlu disimpan oleh config.
+Button tidak didaftarkan sebagai state config karena Button adalah
+action.
 
-Component akan otomatis didaftarkan kecuali:
+------------------------------------------------------------------------
+
+# 42. Config ID
+
+Gunakan ID unik untuk component yang ingin disimpan.
+
+### Recommended
+
+``` lua
+local AutoFarm = Section:CreateToggle({
+    Name = "Auto Farm",
+    Id = "AutoFarm"
+})
+
+local Speed = Section:CreateSlider({
+    Name = "Speed",
+    Id = "FarmSpeed"
+})
+
+local Mode = Section:CreateDropdown({
+    Name = "Mode",
+    Id = "FarmMode"
+})
+```
+
+Jika `Id` tidak diberikan, library menggunakan:
+
+``` lua
+options.Name
+```
+
+sebagai ID.
+
+------------------------------------------------------------------------
+
+# 43. `ConfigIgnore`
+
+Component dapat dikecualikan dari config:
 
 ``` lua
 ConfigIgnore = true
 ```
 
-atau tidak mempunyai ID/nama yang dapat digunakan.
-
-------------------------------------------------------------------------
-
-# 20. Config ID
-
-Disarankan selalu memberikan `Id` unik.
+Example:
 
 ``` lua
-local AutoFarm = Section:CreateToggle({
-    Name = "Auto Farm",
-    Id = "AutoFarm",
-    Default = false
-})
-```
-
-Contoh:
-
-``` lua
-local Speed = Section:CreateSlider({
-    Name = "Speed",
-    Id = "FarmSpeed",
-    Min = 0,
-    Max = 100,
-    Default = 50
-})
-```
-
-Jangan menggunakan ID yang sama untuk dua component berbeda.
-
-------------------------------------------------------------------------
-
-# 21. Ignore Config
-
-Untuk component yang tidak ingin disimpan:
-
-``` lua
-local Temporary = Section:CreateToggle({
-    Name = "Temporary Toggle",
-    Default = false,
+local TemporaryToggle = Section:CreateToggle({
+    Name = "Temporary",
     ConfigIgnore = true
 })
 ```
 
+Component tersebut tidak diregister ke ConfigManager.
+
 ------------------------------------------------------------------------
 
-# 22. Window Config API
+# 44. Create Config Object
 
 ## `Window:CreateConfig(name)`
-
-Membuat object config wrapper.
 
 ``` lua
 local Config = Window:CreateConfig("Default")
 ```
 
-### API
+Object config memiliki:
 
 ``` lua
 Config:Save()
-Config:Load()
+Config:Load(fireCallback)
 Config:Delete()
 Config:Exists()
 Config:GetName()
-Config:SetName("NewName")
+Config:SetName(name)
 Config:List()
 Config:GetValues()
+```
+
+------------------------------------------------------------------------
+
+# 45. Config Save
+
+``` lua
+Config:Save()
 ```
 
 Contoh:
@@ -1351,51 +1961,118 @@ Contoh:
 ``` lua
 local Config = Window:CreateConfig("MyConfig")
 
-Config:Save()
+local ok, result = Config:Save()
 
-local exists = Config:Exists()
+print(ok)
+print(result)
+```
 
-if exists then
-    Config:Load(false)
+------------------------------------------------------------------------
+
+# 46. Config Load
+
+``` lua
+Config:Load()
+```
+
+Dengan callback:
+
+``` lua
+Config:Load(true)
+```
+
+Tanpa callback:
+
+``` lua
+Config:Load(false)
+```
+
+------------------------------------------------------------------------
+
+# 47. Config Delete
+
+``` lua
+Config:Delete()
+```
+
+## Config Exists
+
+``` lua
+if Config:Exists() then
+    print("Config exists")
+end
+```
+
+## Config Name
+
+``` lua
+print(Config:GetName())
+```
+
+``` lua
+Config:SetName("MyNewConfig")
+```
+
+## List Configs
+
+``` lua
+local configs = Config:List()
+
+for _, name in ipairs(configs) do
+    print(name)
+end
+```
+
+## Get Current Values
+
+``` lua
+local values = Config:GetValues()
+
+for id, value in pairs(values) do
+    print(id, value)
 end
 ```
 
 ------------------------------------------------------------------------
 
+# 48. Window Config API
+
+Selain object config, Window menyediakan API langsung.
+
 ## `Window:RegisterConfig(id, controlType, control)`
 
-Registrasi manual.
+Register control secara manual.
 
 ``` lua
 Window:RegisterConfig(
-    "MySetting",
+    "MyToggle",
     "Toggle",
-    MyToggle
+    Toggle
 )
 ```
 
-Biasanya tidak diperlukan karena component otomatis melakukan
-registration.
+Return:
+
+``` text
+true
+```
+
+atau:
+
+``` text
+false
+```
 
 ------------------------------------------------------------------------
 
 ## `Window:SaveConfig(name)`
 
 ``` lua
-local ok, result = Window:SaveConfig("MyConfig")
-
-if ok then
-    print("Saved:", result)
-else
-    warn("Save failed:", result)
-end
+local ok, result =
+    Window:SaveConfig("MyConfig")
 ```
 
-**Return:**
-
-``` text
-ok, result
-```
+Jika berhasil, Window juga menampilkan notification `Config Saved`.
 
 ------------------------------------------------------------------------
 
@@ -1403,16 +2080,22 @@ ok, result
 
 ``` lua
 local ok, result =
-    Window:LoadConfig("MyConfig", false)
+    Window:LoadConfig("MyConfig")
 ```
 
-Jika `fireCallback`:
+Dengan callback:
 
 ``` lua
 Window:LoadConfig("MyConfig", true)
 ```
 
-maka callback component akan dijalankan ketika nilai diterapkan.
+Tanpa callback:
+
+``` lua
+Window:LoadConfig("MyConfig", false)
+```
+
+Jika berhasil, Window menampilkan notification `Config Loaded`.
 
 ------------------------------------------------------------------------
 
@@ -1423,41 +2106,31 @@ local ok, result =
     Window:DeleteConfig("MyConfig")
 ```
 
-------------------------------------------------------------------------
-
 ## `Window:ConfigExists(name)`
 
 ``` lua
 if Window:ConfigExists("MyConfig") then
-    print("Config exists")
+    print("Exists")
 end
 ```
-
-**Return:** `boolean`
-
-------------------------------------------------------------------------
 
 ## `Window:ListConfigs()`
 
 ``` lua
-local configs = Window:ListConfigs()
+local configs =
+    Window:ListConfigs()
 
 for _, name in ipairs(configs) do
     print(name)
 end
 ```
 
-**Return:** `table`
-
-------------------------------------------------------------------------
-
 ## `Window:GetActiveConfig()`
 
 ``` lua
-local active = Window:GetActiveConfig()
+local active =
+    Window:GetActiveConfig()
 ```
-
-------------------------------------------------------------------------
 
 ## `Window:SetActiveConfig(name)`
 
@@ -1465,365 +2138,459 @@ local active = Window:GetActiveConfig()
 Window:SetActiveConfig("MyConfig")
 ```
 
-------------------------------------------------------------------------
-
 ## `Window:GetConfigValues()`
 
-Mengambil nilai semua component yang terdaftar.
-
 ``` lua
-local values = Window:GetConfigValues()
-
-for id, value in pairs(values) do
-    print(id, value)
-end
+local values =
+    Window:GetConfigValues()
 ```
-
-------------------------------------------------------------------------
 
 ## `Window:GetRegisteredConfigs()`
 
 ``` lua
-local registered =
+local controls =
     Window:GetRegisteredConfigs()
 
-for id, controlType in pairs(registered) do
+for id, controlType in pairs(controls) do
     print(id, controlType)
 end
 ```
 
-Contoh hasil:
+------------------------------------------------------------------------
 
-``` text
-AutoFarm    Toggle
-FarmSpeed   Slider
-FarmMode    Dropdown
-FarmKey     Keybind
+# 49. Config Manager UI
+
+Library menyediakan UI config siap pakai.
+
+## `Tab:CreateConfigManager(options)`
+
+### Basic
+
+``` lua
+local ConfigUI = ConfigTab:CreateConfigManager({
+    DefaultName = "Default"
+})
 ```
+
+### Full
+
+``` lua
+local ConfigUI = ConfigTab:CreateConfigManager({
+    SectionName = "Configuration",
+
+    DefaultName = "Default",
+
+    NameInput = "Config Name",
+    Placeholder = "Enter config name...",
+
+    SelectorName = "Available Configs",
+    Search = true,
+
+    SaveText = "Save Config",
+    LoadText = "Load Config",
+    DeleteText = "Delete Config",
+    RefreshText = "Refresh Configs",
+
+    AutoLoad = false,
+    AutoLoadName = "Default",
+
+    AutoSave = false
+})
+```
+
+## Options
+
+  Option           Type      Default                    Description
+  ---------------- --------- -------------------------- ------------------------
+  `SectionName`    string    `"Configuration"`          Nama section
+  `DefaultName`    string    `"Default"`                Nama config default
+  `NameInput`      string    `"Config Name"`            Nama input
+  `Placeholder`    string    `"Enter config name..."`   Placeholder
+  `SelectorName`   string    `"Available Configs"`      Nama dropdown
+  `Search`         boolean   `true`                     Search config
+  `SaveText`       string    `"Save Config"`            Text tombol save
+  `LoadText`       string    `"Load Config"`            Text tombol load
+  `DeleteText`     string    `"Delete Config"`          Text tombol delete
+  `RefreshText`    string    `"Refresh Configs"`        Text tombol refresh
+  `AutoLoad`       boolean   `false`                    Load otomatis
+  `AutoLoadName`   string    `DefaultName`              Config untuk auto-load
+  `AutoSave`       boolean   `false`                    Save otomatis
 
 ------------------------------------------------------------------------
 
-# 23. Config Manager UI
+# 50. Config Manager Runtime API
 
-Library juga memiliki method:
+## `ConfigUI:Refresh()`
 
-``` lua
-Tab:CreateConfigManager(options)
-```
-
-Method ini adalah UI wrapper untuk config system.
-
-> Jika ingin membuat UI Config sendiri menggunakan
-> Button/Input/Dropdown, method ini tidak wajib digunakan.
-
-### Options
-
-``` lua
-local ConfigUI =
-    Tab:CreateConfigManager({
-        SectionName = "Configuration",
-        DefaultName = "Default",
-        NameInput = "Config Name",
-        Placeholder = "Enter config name...",
-        SelectorName = "Available Configs",
-        Search = true,
-
-        SaveText = "Save Config",
-        LoadText = "Load Config",
-        DeleteText = "Delete Config",
-        RefreshText = "Refresh Configs",
-
-        AutoLoad = false,
-        AutoLoadName = "Default",
-        AutoSave = false
-    })
-```
-
-### API return
+Refresh daftar config.
 
 ``` lua
 ConfigUI:Refresh()
-ConfigUI:Save(name)
-ConfigUI:Load(name, fireCallback)
-ConfigUI:Delete(name)
-ConfigUI:Exists(name)
-ConfigUI:List()
-ConfigUI:GetName()
-ConfigUI:SetName(name)
+```
 
-ConfigUI:GetSelector()
-ConfigUI:GetInput()
+## `ConfigUI:Save(name)`
 
-ConfigUI:GetGameId()
-ConfigUI:GetGameName()
-ConfigUI:GetGameFolder()
-ConfigUI:GetConfigFolder()
+``` lua
+ConfigUI:Save("MyConfig")
+```
+
+## `ConfigUI:Load(name, fireCallback)`
+
+``` lua
+ConfigUI:Load("MyConfig")
+```
+
+## `ConfigUI:Delete(name)`
+
+``` lua
+ConfigUI:Delete("MyConfig")
+```
+
+## `ConfigUI:Exists(name)`
+
+``` lua
+if ConfigUI:Exists("MyConfig") then
+    print("Exists")
+end
+```
+
+## `ConfigUI:List()`
+
+``` lua
+local configs = ConfigUI:List()
+```
+
+## `ConfigUI:GetName()`
+
+``` lua
+local name = ConfigUI:GetName()
+```
+
+## `ConfigUI:SetName(name)`
+
+``` lua
+ConfigUI:SetName("MyConfig")
+```
+
+## `ConfigUI:GetSelector()`
+
+Mengambil dropdown config selector.
+
+``` lua
+local Selector =
+    ConfigUI:GetSelector()
+```
+
+## `ConfigUI:GetInput()`
+
+Mengambil TextBox nama config.
+
+``` lua
+local Input =
+    ConfigUI:GetInput()
 ```
 
 ------------------------------------------------------------------------
 
-# 24. Config Storage
+# 51. Config Manager Game Information
 
-Config disimpan berdasarkan game.
+Config manager juga menyediakan informasi folder/game.
 
-Struktur dasarnya:
+## `ConfigUI:GetGameId()`
+
+``` lua
+local gameId =
+    ConfigUI:GetGameId()
+```
+
+## `ConfigUI:GetGameName()`
+
+``` lua
+local gameName =
+    ConfigUI:GetGameName()
+```
+
+## `ConfigUI:GetGameFolder()`
+
+``` lua
+local folder =
+    ConfigUI:GetGameFolder()
+```
+
+## `ConfigUI:GetConfigFolder()`
+
+``` lua
+local folder =
+    ConfigUI:GetConfigFolder()
+```
+
+------------------------------------------------------------------------
+
+# 52. Config Storage
+
+Config menggunakan game identity.
+
+Struktur konseptual:
 
 ``` text
 PHILANX-HUB/
 └── GameName_GameId/
-    ├── Default.json
-    ├── Farm.json
-    └── PvP.json
+    ├── Config1.json
+    ├── Config2.json
+    └── Config3.json
 ```
 
-`GameId` digunakan sebagai identitas utama folder game, sedangkan nama
-game digunakan sebagai prefix yang mudah dibaca.
+`GameId` menjadi key utama untuk menentukan folder game.
 
-Jika file API tidak tersedia, library memiliki fallback memory storage
-selama runtime.
+Nama game digunakan sebagai prefix yang mudah dibaca.
 
 ------------------------------------------------------------------------
 
-# 25. Config Data Types
+# 53. Config File Naming
 
-Config manager dapat menangani:
+Nama config disanitasi sebelum menjadi nama file.
 
--   string
--   number
--   boolean
--   table
--   `EnumItem`, khususnya `Enum.KeyCode`
--   `Color3`
+Secara umum:
 
-`EnumItem` disimpan dengan metadata type dan name, lalu direkonstruksi
-ketika config dimuat.
+``` text
+My Config
+```
 
-`Color3` juga diubah ke nilai `r`, `g`, `b` saat serialization.
+akan digunakan sebagai nama aman:
+
+``` text
+My_Config.json
+```
+
+Karakter yang tidak diizinkan akan dibersihkan.
 
 ------------------------------------------------------------------------
 
-# 26. Contoh Lengkap --- Semua Element
+# 54. Config Serialization
+
+Serializer source mendukung:
+
+``` text
+string
+number
+boolean
+nil
+table
+Color3
+EnumItem
+```
+
+### Color3
+
+Color3 disimpan dalam bentuk:
 
 ``` lua
-local UILibrary = loadstring(game:HttpGet("YOUR_LIBRARY_URL"))()
+{
+    __type = "Color3",
+    r = value.R,
+    g = value.G,
+    b = value.B
+}
+```
 
-UILibrary:SetTheme({
-    Accent = Color3.fromRGB(35, 155, 255)
+### EnumItem
+
+EnumItem disimpan dalam bentuk informasi enum + name.
+
+Saat decode, source secara khusus mendukung `Enum.KeyCode`.
+
+------------------------------------------------------------------------
+
+# 55. File API Fallback
+
+Config mencoba menggunakan file API jika tersedia.
+
+API yang digunakan:
+
+``` text
+writefile
+readfile
+isfile
+makefolder
+isfolder
+listfiles
+delfile
+```
+
+Jika file API tidak tersedia, ConfigManager memiliki fallback memory
+untuk penyimpanan runtime.
+
+------------------------------------------------------------------------
+
+# 56. Config Collect / Apply
+
+Secara internal ConfigManager mengumpulkan value dari registered
+controls.
+
+Untuk Input:
+
+``` lua
+control.Text
+```
+
+Untuk control lain, ConfigManager menggunakan:
+
+``` lua
+control:GetValue()
+```
+
+atau:
+
+``` lua
+control:Get()
+```
+
+Ketika loading:
+
+``` lua
+control:SetValue(value, fireCallback)
+```
+
+atau:
+
+``` lua
+control:Set(value, fireCallback)
+```
+
+------------------------------------------------------------------------
+
+# 57. Recommended Config Pattern
+
+``` lua
+local AutoFarm = Settings:CreateToggle({
+    Name = "Auto Farm",
+    Id = "AutoFarm",
+    Default = false
 })
 
+local Speed = Settings:CreateSlider({
+    Name = "Farm Speed",
+    Id = "FarmSpeed",
+    Min = 0,
+    Max = 100,
+    Default = 50
+})
+
+local Mode = Settings:CreateDropdown({
+    Name = "Mode",
+    Id = "FarmMode",
+
+    Values = {
+        "Safe",
+        "Normal",
+        "Fast"
+    },
+
+    Default = "Normal"
+})
+```
+
+Kemudian:
+
+``` lua
+local ConfigUI = ConfigTab:CreateConfigManager({
+    DefaultName = "Default"
+})
+```
+
+------------------------------------------------------------------------
+
+# 58. Complete Game UI Template
+
+``` lua
+local UILibrary =
+    loadstring(game:HttpGet("YOUR_LIBRARY_URL"))()
+
+--==================================================
+-- WINDOW
+--==================================================
+
 local Window = UILibrary:CreateWindow({
-    Title = "PHILANX HUB",
-    Subtitle = "Library Example",
-    Size = UDim2.fromOffset(650, 450),
-    Logo = "rbxassetid://132859114380485"
+    Title = "MY GAME",
+    Subtitle = "Game Script",
+    Size = UDim2.fromOffset(650, 450)
 })
 
 --==================================================
--- TAB
+-- MAIN
 --==================================================
 
 local MainTab = Window:CreateTab({
     Name = "Main",
-    Icon = "🏠"
+    Icon = "★"
+})
+
+local General = MainTab:CreateSection("General")
+
+General:CreateParagraph({
+    Title = "Welcome",
+    Content = "Configure your game features here."
 })
 
 --==================================================
--- BASIC ELEMENTS
+-- SETTINGS
 --==================================================
 
-local Basic = MainTab:CreateSection("Basic Elements")
+local Settings = MainTab:CreateSection("Settings")
 
-Basic:CreateLabel("PHILANX HUB Example")
-
-local Paragraph = Basic:CreateParagraph({
-    Title = "Information",
-    Content = "Contoh semua element yang tersedia."
-})
-
-Basic:CreateDivider()
-
-local Status = Basic:CreateStatusBox({
-    Type = "success",
-    Title = "Library Ready",
-    Content = "Semua component berhasil dibuat."
-})
-
---==================================================
--- CONTROLS
---==================================================
-
-local Controls = MainTab:CreateSection("Controls")
-
-local Button = Controls:CreateButton({
-    Name = "Test Button",
-
-    Callback = function()
-        print("Button clicked")
-
-        Window:Notify({
-            Title = "Button",
-            Content = "Test Button clicked.",
-            Duration = 2
-        })
-    end
-})
-
-local Toggle = Controls:CreateToggle({
-    Name = "Test Toggle",
-    Id = "TestToggle",
+local Enabled = Settings:CreateToggle({
+    Name = "Enabled",
+    Id = "Enabled",
     Default = false,
 
     Callback = function(value)
-        print("Toggle:", value)
+        print("Enabled:", value)
     end
 })
 
-local Input = Controls:CreateInput({
-    Placeholder = "Type something...",
-    Default = "",
-
-    Callback = function(text, enterPressed)
-        print("Input:", text)
-        print("Enter:", enterPressed)
-    end
-})
-
-local SingleDropdown = Controls:CreateDropdown({
-    Name = "Single Dropdown",
-    Id = "SingleDropdown",
+local Mode = Settings:CreateDropdown({
+    Name = "Mode",
+    Id = "Mode",
 
     Values = {
+        "Easy",
         "Normal",
-        "Fast",
-        "Extreme"
+        "Hard"
     },
 
     Default = "Normal",
-    Multi = false,
-    Search = true,
 
     Callback = function(value)
-        print("Single:", value)
+        print("Mode:", value)
     end
 })
 
-local MultiDropdown = Controls:CreateDropdown({
-    Name = "Multi Dropdown",
-    Id = "MultiDropdown",
-
-    Values = {
-        "ESP",
-        "Speed",
-        "Auto Farm",
-        "Auto Collect"
-    },
-
-    Default = {
-        "ESP"
-    },
-
-    Multi = true,
-    MaxSelected = 3,
-    Search = true,
-
-    Callback = function(values)
-        print("Multi selected:")
-
-        for _, value in ipairs(values) do
-            print("-", value)
-        end
-    end
-})
-
-local Keybind = Controls:CreateKeybind({
-    Name = "Test Keybind",
-    Id = "TestKeybind",
-
-    Default = Enum.KeyCode.RightShift,
-
-    Changed = function(key)
-        print("Key changed:", key.Name)
-    end,
-
-    Callback = function(key)
-        Window:Toggle()
-    end
-})
-
-local Slider = Controls:CreateSlider({
-    Name = "Test Slider",
-    Id = "TestSlider",
+local Speed = Settings:CreateSlider({
+    Name = "Speed",
+    Id = "Speed",
 
     Min = 0,
     Max = 100,
     Step = 5,
     Default = 50,
-    Decimals = 0,
 
     Callback = function(value)
-        print("Slider:", value)
+        print("Speed:", value)
     end
 })
 
 --==================================================
--- NOTIFICATIONS
+-- ACTION
 --==================================================
 
-local NotificationTab = Window:CreateTab({
-    Name = "Notifications",
-    Icon = "🔔"
-})
-
-local NotificationSection =
-    NotificationTab:CreateSection("Notifications")
-
-NotificationSection:CreateButton({
-    Name = "Info",
+Settings:CreateButton({
+    Name = "Start",
 
     Callback = function()
         Window:Notify({
-            Title = "Info",
-            Content = "Information notification.",
-            Duration = 3
-        })
-    end
-})
-
-NotificationSection:CreateButton({
-    Name = "Success",
-
-    Callback = function()
-        Window:Notify({
-            Title = "Success",
-            Content = "Success notification.",
-            Duration = 3,
-            Color = Color3.fromRGB(70, 215, 140)
-        })
-    end
-})
-
-NotificationSection:CreateButton({
-    Name = "Warning",
-
-    Callback = function()
-        Window:Notify({
-            Title = "Warning",
-            Content = "Warning notification.",
-            Duration = 3,
-            Color = Color3.fromRGB(255, 195, 70)
-        })
-    end
-})
-
-NotificationSection:CreateButton({
-    Name = "Error",
-
-    Callback = function()
-        Window:Notify({
-            Title = "Error",
-            Content = "Error notification.",
-            Duration = 3,
-            Color = Color3.fromRGB(245, 85, 95)
+            Title = "Game",
+            Content = "Started.",
+            Duration = 2
         })
     end
 })
@@ -1834,291 +2601,167 @@ NotificationSection:CreateButton({
 
 local ConfigTab = Window:CreateTab({
     Name = "Config",
-    Icon = "⚙"
+    Icon = "▣"
 })
 
-local ConfigSection =
-    ConfigTab:CreateSection("Configuration")
-
-local ConfigName = ConfigSection:CreateInput({
-    Placeholder = "Config name...",
-    Default = "Default",
-    ConfigIgnore = true
+local ConfigUI = ConfigTab:CreateConfigManager({
+    SectionName = "Configuration",
+    DefaultName = "Default"
 })
-
-local ConfigSelector = ConfigSection:CreateDropdown({
-    Name = "Available Configs",
-    Values = Window:ListConfigs(),
-    Multi = false,
-    Search = true,
-    ConfigIgnore = true,
-
-    Callback = function(value)
-        if value ~= nil then
-            ConfigName.Text = tostring(value)
-        end
-    end
-})
-
-local function RefreshConfigs()
-    ConfigSelector:SetValues(
-        Window:ListConfigs(),
-        false
-    )
-end
-
-ConfigSection:CreateButton({
-    Name = "Save Config",
-    ConfigIgnore = true,
-
-    Callback = function()
-        local name = ConfigName.Text
-
-        if name == "" then
-            Window:Notify({
-                Title = "Config",
-                Content = "Nama config kosong.",
-                Duration = 2
-            })
-
-            return
-        end
-
-        local ok, result =
-            Window:SaveConfig(name)
-
-        if ok then
-            RefreshConfigs()
-
-            Window:Notify({
-                Title = "Config Saved",
-                Content = name .. " berhasil disimpan.",
-                Duration = 2
-            })
-        else
-            Window:Notify({
-                Title = "Config Error",
-                Content = tostring(result),
-                Duration = 3
-            })
-        end
-    end
-})
-
-ConfigSection:CreateButton({
-    Name = "Load Config",
-    ConfigIgnore = true,
-
-    Callback = function()
-        local name = ConfigName.Text
-
-        if name == "" then
-            return
-        end
-
-        local ok, result =
-            Window:LoadConfig(name, false)
-
-        if ok then
-            Window:Notify({
-                Title = "Config Loaded",
-                Content = name .. " berhasil dimuat.",
-                Duration = 2
-            })
-        else
-            Window:Notify({
-                Title = "Config Error",
-                Content = tostring(result),
-                Duration = 3
-            })
-        end
-    end
-})
-
-ConfigSection:CreateButton({
-    Name = "Delete Config",
-    ConfigIgnore = true,
-
-    Callback = function()
-        local name = ConfigName.Text
-
-        if name == "" then
-            return
-        end
-
-        local ok, result =
-            Window:DeleteConfig(name)
-
-        if ok then
-            RefreshConfigs()
-
-            Window:Notify({
-                Title = "Config Deleted",
-                Content = name .. " berhasil dihapus.",
-                Duration = 2
-            })
-        else
-            Window:Notify({
-                Title = "Config Error",
-                Content = tostring(result),
-                Duration = 3
-            })
-        end
-    end
-})
-
-ConfigSection:CreateButton({
-    Name = "Refresh Configs",
-    ConfigIgnore = true,
-
-    Callback = function()
-        RefreshConfigs()
-
-        Window:Notify({
-            Title = "Config",
-            Content = "Config list diperbarui.",
-            Duration = 2
-        })
-    end
-})
-
-RefreshConfigs()
 ```
 
 ------------------------------------------------------------------------
 
-# 27. Contoh Config Otomatis
+# 59. Recommended Game Logic Pattern
 
-Jika hanya ingin menyimpan setting tanpa membuat UI Config manual:
+Jangan menaruh seluruh game logic di callback UI.
+
+Gunakan state variable.
+
+### UI
+
+``` lua
+local AutoFarmEnabled = false
+
+local AutoFarm = Settings:CreateToggle({
+    Name = "Auto Farm",
+    Id = "AutoFarm",
+    Default = false,
+
+    Callback = function(value)
+        AutoFarmEnabled = value
+    end
+})
+```
+
+### Game Logic
+
+``` lua
+local function RunAutoFarm()
+    if not AutoFarmEnabled then
+        return
+    end
+
+    -- Auto Farm logic
+end
+```
+
+### Loop
+
+``` lua
+task.spawn(function()
+    while task.wait(0.1) do
+        if AutoFarmEnabled then
+            RunAutoFarm()
+        end
+    end
+end)
+```
+
+Dengan struktur ini UI hanya mengubah state, sedangkan logic game tetap
+terpisah.
+
+------------------------------------------------------------------------
+
+# 60. Practical Workflow
+
+Saat membuat script/game baru:
+
+## Step 1 --- Window
 
 ``` lua
 local Window = UILibrary:CreateWindow({
-    Title = "PHILANX HUB"
+    Title = "MY GAME"
 })
+```
 
-local Tab = Window:CreateTab({
+## Step 2 --- Tabs
+
+``` lua
+local Main = Window:CreateTab({
     Name = "Main"
 })
 
-local Section = Tab:CreateSection("Settings")
-
-local AutoFarm = Section:CreateToggle({
-    Name = "Auto Farm",
-    Id = "AutoFarm",
-    Default = false
+local Settings = Window:CreateTab({
+    Name = "Settings"
 })
 
-local Speed = Section:CreateSlider({
-    Name = "Speed",
-    Id = "Speed",
-    Min = 0,
-    Max = 100,
-    Default = 50
+local Config = Window:CreateTab({
+    Name = "Config"
 })
-
--- Save
-Window:SaveConfig("Default")
-
--- Load
-Window:LoadConfig("Default", false)
-
--- Delete
-Window:DeleteConfig("Default")
 ```
 
-------------------------------------------------------------------------
-
-# 28. Best Practice ID
-
-Gunakan ID yang stabil dan unik:
+## Step 3 --- Sections
 
 ``` lua
-Id = "AutoFarm"
-Id = "FarmSpeed"
-Id = "FarmMode"
-Id = "FarmFeatures"
-Id = "FarmKey"
+local General =
+    Main:CreateSection("General")
+
+local GameSettings =
+    Settings:CreateSection("Game Settings")
 ```
 
-Hindari:
+## Step 4 --- Components
 
 ``` lua
-Id = "Toggle"
-Id = "Slider"
-Id = "Dropdown"
+GameSettings:CreateToggle(...)
+GameSettings:CreateDropdown(...)
+GameSettings:CreateSlider(...)
+GameSettings:CreateKeybind(...)
+GameSettings:CreateInput(...)
 ```
 
-jika terdapat lebih dari satu component dengan ID yang sama.
-
-------------------------------------------------------------------------
-
-# 29. Fire Callback Saat Load
-
-Secara default API `LoadConfig` menerima parameter:
+## Step 5 --- Connect State
 
 ``` lua
-Window:LoadConfig(name, fireCallback)
-```
+local Enabled = false
 
-### Tanpa callback
+GameSettings:CreateToggle({
+    Name = "Enabled",
 
-``` lua
-Window:LoadConfig("Default", false)
-```
-
-Ini hanya menerapkan state component.
-
-### Dengan callback
-
-``` lua
-Window:LoadConfig("Default", true)
-```
-
-Callback masing-masing component akan dipanggil ketika nilai diterapkan.
-
-------------------------------------------------------------------------
-
-# 30. Contoh Membaca Semua Setting
-
-``` lua
-local values = Window:GetConfigValues()
-
-for id, value in pairs(values) do
-    print(id, value)
-end
-```
-
-Untuk value berbentuk table:
-
-``` lua
-for id, value in pairs(values) do
-    if type(value) == "table" then
-        print(id, "table")
-
-        for _, item in ipairs(value) do
-            print("  ", item)
-        end
-    else
-        print(id, value)
+    Callback = function(value)
+        Enabled = value
     end
+})
+```
+
+## Step 6 --- Game Logic
+
+``` lua
+local function UpdateGame()
+    if not Enabled then
+        return
+    end
+
+    -- Game logic
 end
+```
+
+## Step 7 --- Config
+
+``` lua
+Config:CreateConfigManager({
+    DefaultName = "Default"
+})
 ```
 
 ------------------------------------------------------------------------
 
-# 31. Complete API Reference
+# 61. API Cheat Sheet
 
-## UILibrary
+## Library
 
-``` text
+``` lua
 UILibrary:SetTheme(theme)
 UILibrary:CreateWindow(options)
 ```
 
 ## Window
 
-``` text
-Window:SetVisible(visible)
+``` lua
+Window:CreateTab(options)
+
+Window:SetVisible(value)
 Window:Toggle()
 Window:IsVisible()
 
@@ -2126,15 +2769,17 @@ Window:Minimize()
 Window:Restore()
 Window:ToggleMinimize()
 Window:IsMinimized()
-Window:Destroy()
 
 Window:SetTitle(title)
-Window:SetSubtitle(subtitle)
-Window:SetLogo(logo)
-
 Window:GetTitle()
+
+Window:SetSubtitle(subtitle)
 Window:GetSubtitle()
+
+Window:SetLogo(logo)
 Window:GetLogo()
+
+Window:Notify(options)
 
 Window:CreateConfig(name)
 Window:RegisterConfig(id, controlType, control)
@@ -2144,25 +2789,26 @@ Window:LoadConfig(name, fireCallback)
 Window:DeleteConfig(name)
 Window:ConfigExists(name)
 Window:ListConfigs()
+
 Window:GetActiveConfig()
 Window:SetActiveConfig(name)
+
 Window:GetConfigValues()
 Window:GetRegisteredConfigs()
 
-Window:CreateTab(options)
-Window:Notify(options)
+Window:Destroy()
 ```
 
 ## Tab
 
-``` text
+``` lua
 Tab:CreateSection(name)
 Tab:CreateConfigManager(options)
 ```
 
 ## Section
 
-``` text
+``` lua
 Section:SetCollapsed(value)
 Section:Toggle()
 Section:IsCollapsed()
@@ -2181,7 +2827,7 @@ Section:CreateSlider(options)
 
 ## Paragraph
 
-``` text
+``` lua
 Paragraph:SetTitle(title)
 Paragraph:SetContent(content)
 Paragraph:Set(text)
@@ -2189,7 +2835,7 @@ Paragraph:Set(text)
 
 ## StatusBox
 
-``` text
+``` lua
 StatusBox:SetTitle(title)
 StatusBox:SetContent(content)
 StatusBox:SetType(type)
@@ -2197,7 +2843,7 @@ StatusBox:SetType(type)
 
 ## Toggle
 
-``` text
+``` lua
 Toggle:Set(value, fireCallback)
 Toggle:Get()
 Toggle:SetTitle(title)
@@ -2206,9 +2852,10 @@ Toggle:SetVisible(visible)
 
 ## Dropdown
 
-``` text
+``` lua
 Dropdown:Set(value, fireCallback)
 Dropdown:Get()
+
 Dropdown:SetVisible(visible)
 Dropdown:SetTitle(title)
 Dropdown:IsMulti()
@@ -2236,39 +2883,56 @@ Dropdown:ClearSearch()
 
 ## Keybind
 
-``` text
+``` lua
 Keybind:Set(key)
 Keybind:Get()
 ```
 
 ## Slider
 
-``` text
+``` lua
 Slider:Set(value, fireCallback)
 Slider:SetValue(value, fireCallback)
 
 Slider:Get()
 Slider:GetValue()
 
-Slider:SetMin(minimum, fireCallback)
-Slider:SetMax(maximum, fireCallback)
-Slider:SetStep(step, fireCallback)
-
+Slider:SetMin(value, fireCallback)
 Slider:GetMin()
+
+Slider:SetMax(value, fireCallback)
 Slider:GetMax()
+
+Slider:SetStep(value, fireCallback)
 Slider:GetStep()
 
-Slider:SetDecimals(decimals, fireCallback)
+Slider:SetDecimals(value, fireCallback)
 Slider:GetDecimals()
 
 Slider:SetTitle(title)
 Slider:SetVisible(visible)
 ```
 
+## Config Object
+
+``` lua
+Config:Save()
+Config:Load(fireCallback)
+Config:Delete()
+Config:Exists()
+
+Config:GetName()
+Config:SetName(name)
+
+Config:List()
+Config:GetValues()
+```
+
 ## Config Manager UI
 
-``` text
+``` lua
 ConfigUI:Refresh()
+
 ConfigUI:Save(name)
 ConfigUI:Load(name, fireCallback)
 ConfigUI:Delete(name)
@@ -2289,30 +2953,134 @@ ConfigUI:GetConfigFolder()
 
 ------------------------------------------------------------------------
 
-# 32. Notes
+# 62. Component Comparison
 
-1.  `CreateInput()` mengembalikan `TextBox` Roblox langsung.
-2.  Toggle, Dropdown, Keybind, dan Slider mengembalikan API wrapper.
-3.  Component state dapat masuk config secara otomatis.
-4.  Gunakan `ConfigIgnore = true` untuk component yang tidak ingin
-    disimpan.
-5.  Gunakan `Id` unik untuk config.
-6.  Multi Dropdown mengembalikan table.
-7.  Keybind menggunakan `Enum.KeyCode`.
-8.  Slider menerapkan `Step` pada nilai aktual.
-9.  `Color3` dan `Enum.KeyCode` memiliki serialization khusus di config.
-10. Config dipisahkan berdasarkan `GameId`.
-11. Jika file API tidak tersedia, config memiliki fallback memory selama
-    runtime.
-12. `CreateConfigManager()` adalah wrapper UI tambahan; UI Config manual
-    dapat dibuat langsung menggunakan element library dan
-    `Window:SaveConfig()`, `LoadConfig()`, `DeleteConfig()`, dan
-    `ListConfigs()`.
+  ---------------------------------------------------------------------------------
+  Component            Callback     Persistent    Runtime API   Description/Content
+                                        Config                
+  -------------- -------------- -------------- -------------- ---------------------
+  Label                     ---            ---         Roblox                  Text
+                                                    TextLabel 
+
+  Paragraph                 ---            ---            Yes       Title + Content
+
+  Divider                   ---            ---            ---      Visual separator
+
+  StatusBox                 ---            ---            Yes     Title + Content +
+                                                                               Type
+
+  Button                    Yes            ---         Roblox      **Tidak ada Desc
+                                                   TextButton                 API**
+
+  Toggle                    Yes            Yes            Yes                  Name
+
+  Input                     Yes            Yes        TextBox           Placeholder
+
+  Dropdown                  Yes            Yes            Yes                Search
+
+  Keybind                   Yes            Yes            Yes                   Key
+
+  Slider                    Yes            Yes            Yes         Numeric value
+
+  Notification              ---            ---  Returns Frame       Title + Content
+  ---------------------------------------------------------------------------------
 
 ------------------------------------------------------------------------
 
-## Source Basis
+# 63. Important API Accuracy Notes
 
-Dokumentasi ini disusun dari source `LIB-PHILANX UI Library` versi 2.8.3
-yang diberikan, termasuk implementasi window, tab, section, component,
-notification, dan config system.
+## Button Description
+
+Source v2.8.3 **belum mempunyai**:
+
+``` lua
+Desc
+Description
+SetDesc()
+SetDescription()
+```
+
+Untuk component dengan deskripsi, gunakan:
+
+``` lua
+Paragraph
+StatusBox
+```
+
+## Input
+
+`CreateInput()` mengembalikan `TextBox`, bukan wrapper API custom.
+
+## Label
+
+`CreateLabel()` mengembalikan `TextLabel`.
+
+## Button
+
+`CreateButton()` mengembalikan `TextButton`.
+
+## Config
+
+Config hanya bekerja untuk component yang didaftarkan.
+
+## IDs
+
+Untuk project besar, gunakan ID yang unik:
+
+``` lua
+Id = "AutoFarm"
+Id = "FarmSpeed"
+Id = "FarmMode"
+```
+
+Jangan memakai ID sama untuk beberapa control.
+
+------------------------------------------------------------------------
+
+# 64. Suggested Documentation Style
+
+Untuk setiap component baru yang ditambahkan ke LIB-PHILANX, dokumentasi
+sebaiknya mengikuti format:
+
+``` text
+# Component
+
+## Creating Component
+
+## Options
+
+## Basic Example
+
+## Callback
+
+## Description / Content
+  hanya jika memang didukung source
+
+## Runtime API
+
+## Dynamic API
+  jika ada
+
+## Config
+
+## Game Example
+
+## Important Notes
+```
+
+Dengan format ini dokumentasi tetap mudah dibaca ketika library semakin
+besar.
+
+------------------------------------------------------------------------
+
+# 65. Source Reference
+
+Library yang didokumentasikan:
+
+``` text
+LIB-PHILANX UI Library
+Version: 2.8.3
+```
+
+Source menyatakan bahwa library ditujukan untuk Roblox Studio / testing
+game sendiri.
