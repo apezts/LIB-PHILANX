@@ -1,4 +1,3 @@
-```
 --========================================================--
 -- CONFIG
 --========================================================--
@@ -768,7 +767,6 @@ local function StartKeyUI(autoKey)
                         )
 
 
-                        -- Bersihkan redeemed key setelah verifikasi berhasil.
                         pcall(function()
 
                             if type(getgenv) == "function"
@@ -850,15 +848,13 @@ local function StartKeyUI(autoKey)
     end
 
 
-
     --========================================================--
     -- AUTO REDEEM KEY
     --========================================================--
     --
-    -- KeySystem:Start() pada build ini menjadi sumber API.
-    -- Jika API Input/Verify tersedia, key akan diverifikasi otomatis.
-    -- Jika tidak tersedia, UI tetap dibiarkan terbuka sehingga tidak
-    -- membuat loader berhenti diam-diam.
+    -- Redeemed key menggunakan jalur verifikasi normal.
+    -- Key dimasukkan otomatis ke input lalu Verify()
+    -- dijalankan.
     --
     if autoKey then
 
@@ -870,12 +866,14 @@ local function StartKeyUI(autoKey)
             local verify =
                 gateResult.Verify
 
+
             if input then
 
                 input.Text =
                     tostring(autoKey)
 
             end
+
 
             if type(verify) == "function" then
 
@@ -887,11 +885,14 @@ local function StartKeyUI(autoKey)
                             verify
                         )
 
+
                     if not ok then
 
                         LogError(
                             "Auto redeem Verify error: " ..
-                            tostring(verifyResult)
+                            tostring(
+                                verifyResult
+                            )
                         )
 
                     end
@@ -922,6 +923,7 @@ local function StartKeyUI(autoKey)
 end
 
 
+--========================================================--
 -- SAVED KEY VERIFICATION
 --========================================================--
 
@@ -938,25 +940,6 @@ local function VerifySavedKey(
     )
 
 
-    -- Key System sudah memuat fungsi private
-    -- untuk mengambil HWID dan mengirim verify.
-    --
-    -- Untuk menjaga satu sumber logika, kita gunakan
-    -- API publik KeySystem:Start() jika saved key
-    -- tersedia. Namun UI tidak perlu ditampilkan
-    -- bila key langsung valid.
-    --
-    -- Karena KeySystem v1.1.1 saat ini hanya
-    -- menyediakan Start() sebagai entry point UI,
-    -- kita lakukan verifikasi melalui temporary
-    -- Key System UI dengan key otomatis.
-    --
-    -- Implementasi di bawah membutuhkan API:
-    -- KeySystem:VerifySavedKey(key)
-    --
-    -- Jika API tersebut belum tersedia, fungsi
-    -- mengembalikan false dan loader menampilkan UI.
-
     if type(
         KeySystem.VerifySavedKey
     ) ~= "function" then
@@ -970,15 +953,6 @@ local function VerifySavedKey(
 
     end
 
-
-    -- VerifySavedKey mengembalikan 2 nilai:
-    --   1) valid  -> boolean
-    --   2) result -> table response server
-    --
-    -- pcall juga harus menangkap kedua return tersebut.
-    -- Sebelumnya hanya return pertama yang ditangkap,
-    -- sehingga "result" berisi boolean lalu kode mencoba
-    -- result.reason -> error "attempt to index boolean with 'reason'".
 
     local ok,
         valid,
@@ -1015,6 +989,7 @@ local function VerifySavedKey(
             )
             or "invalid"
 
+
         return false,
             tostring(reason)
 
@@ -1046,8 +1021,11 @@ local function GetRedeemedKey()
         pcall(function()
 
             if type(getgenv) == "function" then
+
                 return getgenv().PHILANX_REDEEMED_KEY
+
             end
+
 
             return nil
 
@@ -1055,7 +1033,9 @@ local function GetRedeemedKey()
 
 
     if not ok then
+
         return nil
+
     end
 
 
@@ -1076,7 +1056,9 @@ local function GetRedeemedKey()
 
 
     if value == "" then
+
         return nil
+
     end
 
 
@@ -1090,8 +1072,10 @@ local function ClearRedeemedKey()
     pcall(function()
 
         if type(getgenv) == "function" then
+
             getgenv().PHILANX_REDEEMED_KEY =
                 nil
+
         end
 
     end)
@@ -1104,9 +1088,18 @@ end
 --========================================================--
 
 print("")
-print("==============================================")
-print("             PHILANX LOADER 1.4.3")
-print("==============================================")
+
+print(
+    "=============================================="
+)
+
+print(
+    "             PHILANX LOADER 1.4.3"
+)
+
+print(
+    "=============================================="
+)
 
 
 local redeemedKey =
@@ -1119,14 +1112,17 @@ if redeemedKey then
         "Redeemed key ditemukan."
     )
 
+
     Log(
         "Membuka Key System untuk verifikasi otomatis..."
     )
+
 
     local uiStarted =
         StartKeyUI(
             redeemedKey
         )
+
 
     if not uiStarted then
 
@@ -1135,6 +1131,7 @@ if redeemedKey then
         )
 
     end
+
 
     return
 
@@ -1159,6 +1156,7 @@ if savedKey then
         Log(
             "Saved key masih valid."
         )
+
 
         Log(
             "Melewati Key UI."
@@ -1199,4 +1197,3 @@ end
 -- Tampilkan Key System.
 
 StartKeyUI()
-```
