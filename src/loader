@@ -24,7 +24,7 @@ local CONFIG = {
         "PHILANX-HUB/PHILANX_KEY.dat",
 
     DEBUG =
-        true
+        false
 
 }
 
