@@ -855,41 +855,61 @@ local function StartKeyUI(autoKey)
     -- AUTO REDEEM KEY
     --========================================================--
     --
-    -- Redeemed key menggunakan jalur verifikasi normal:
-    -- isi TextBox secara otomatis lalu panggil Verify().
-    -- Jalur ini sengaja tidak memakai VerifySavedKey().
+    -- KeySystem:Start() pada build ini menjadi sumber API.
+    -- Jika API Input/Verify tersedia, key akan diverifikasi otomatis.
+    -- Jika tidak tersedia, UI tetap dibiarkan terbuka sehingga tidak
+    -- membuat loader berhenti diam-diam.
     --
-    if autoKey
-        and type(gateResult) == "table" then
+    if autoKey then
 
-        local input =
-            gateResult.Input
+        if type(gateResult) == "table" then
 
-        local verify =
-            gateResult.Verify
+            local input =
+                gateResult.Input
 
-        if input
-            and type(verify) == "function" then
+            local verify =
+                gateResult.Verify
 
-            pcall(function()
+            if input then
 
                 input.Text =
                     tostring(autoKey)
 
-            end)
+            end
 
-            task.defer(function()
+            if type(verify) == "function" then
 
-                pcall(
-                    verify
+                task.defer(function()
+
+                    local ok,
+                        verifyResult =
+                        pcall(
+                            verify
+                        )
+
+                    if not ok then
+
+                        LogError(
+                            "Auto redeem Verify error: " ..
+                            tostring(verifyResult)
+                        )
+
+                    end
+
+                end)
+
+            else
+
+                LogError(
+                    "Auto redeem: API Verify tidak tersedia."
                 )
 
-            end)
+            end
 
         else
 
             LogError(
-                "Auto redeem gagal: API Input/Verify tidak tersedia."
+                "Auto redeem: KeySystem:Start() tidak mengembalikan API."
             )
 
         end
@@ -902,7 +922,6 @@ local function StartKeyUI(autoKey)
 end
 
 
---========================================================--
 -- SAVED KEY VERIFICATION
 --========================================================--
 
@@ -1104,9 +1123,18 @@ if redeemedKey then
         "Membuka Key System untuk verifikasi otomatis..."
     )
 
-    StartKeyUI(
-        redeemedKey
-    )
+    local uiStarted =
+        StartKeyUI(
+            redeemedKey
+        )
+
+    if not uiStarted then
+
+        LogError(
+            "Key System gagal dibuka."
+        )
+
+    end
 
     return
 
