@@ -1,3 +1,4 @@
+```
 --========================================================--
 -- CONFIG
 --========================================================--
@@ -952,6 +953,70 @@ end
 
 
 --========================================================--
+-- REDEEMED KEY
+--========================================================--
+
+local function GetRedeemedKey()
+
+    local ok,
+        value =
+        pcall(function()
+
+            if type(getgenv) == "function" then
+                return getgenv().PHILANX_REDEEMED_KEY
+            end
+
+            return nil
+
+        end)
+
+
+    if not ok then
+        return nil
+    end
+
+
+    value =
+        tostring(
+            value or ""
+        )
+
+
+    value =
+        value:gsub(
+            "^%s+",
+            ""
+        ):gsub(
+            "%s+$",
+            ""
+        )
+
+
+    if value == "" then
+        return nil
+    end
+
+
+    return value
+
+end
+
+
+local function ClearRedeemedKey()
+
+    pcall(function()
+
+        if type(getgenv) == "function" then
+            getgenv().PHILANX_REDEEMED_KEY =
+                nil
+        end
+
+    end)
+
+end
+
+
+--========================================================--
 -- BOOT
 --========================================================--
 
@@ -959,6 +1024,75 @@ print("")
 print("==============================================")
 print("             PHILANX LOADER 1.4.3")
 print("==============================================")
+
+
+local redeemedKey =
+    GetRedeemedKey()
+
+
+if redeemedKey then
+
+    Log(
+        "Redeemed key ditemukan."
+    )
+
+
+    local valid,
+        result =
+        VerifySavedKey(
+            redeemedKey
+        )
+
+
+    if valid then
+
+        Log(
+            "Redeemed key masih valid."
+        )
+
+
+        SaveKey(
+            redeemedKey
+        )
+
+
+        ClearRedeemedKey()
+
+
+        Log(
+            "Melewati Key UI."
+        )
+
+
+        task.spawn(
+            StartMainSource
+        )
+
+
+        return
+
+    end
+
+
+    local reason =
+        type(result) == "table"
+        and (
+            result.reason
+            or result.error
+        )
+        or result
+        or "invalid"
+
+
+    LogError(
+        "Redeemed key tidak valid: " ..
+        tostring(reason)
+    )
+
+
+    ClearRedeemedKey()
+
+end
 
 
 local savedKey =
@@ -989,6 +1123,7 @@ if savedKey then
             StartMainSource
         )
 
+
         return
 
     end
@@ -1009,11 +1144,6 @@ if savedKey then
     )
 
 
-    -- Expired, revoked, deleted, HWID mismatch,
-    -- atau key tidak lagi valid:
-    -- hapus file agar execute berikutnya
-    -- kembali meminta key.
-
     DeleteSavedKey()
 
 end
@@ -1023,3 +1153,4 @@ end
 -- Tampilkan Key System.
 
 StartKeyUI()
+```
