@@ -8,7 +8,7 @@ local CONFIG = {
         "https://pastebin.com/raw/6Fu9M0tv",
 
     KEY_SYSTEM_URL =
-        "https://pastebin.com/VHKFp9fe",
+        "https://pastebin.com/raw/VHKFp9fe",
 
     MAIN_SOURCE_URL =
         "https://raw.githubusercontent.com/apezts/Nezha/refs/heads/main/loader",
