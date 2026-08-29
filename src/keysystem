@@ -1,3 +1,4 @@
+```
 --========================================================--
 --              PHILANX KEY SYSTEM                        --
 --              UI LIBRARY INTEGRATION                    --
@@ -577,19 +578,12 @@ function KeySystem:Start(options)
     -- VERIFY
     --====================================================--
 
-    local VerifyButton
+    -- Satu fungsi verifikasi dipakai oleh tombol UI dan API Verify().
+    -- Ini menghindari pemanggilan TextButton:Activate(), yang pada
+    -- executor/build UI tertentu tidak tersedia.
 
+    local function PerformVerify()
 
-    VerifyButton =
-        Section:CreateButton({
-
-            Name =
-                "🔐 Verifikasi Key",
-
-            ConfigIgnore = true,
-
-            Callback =
-                function()
 
                     if verifying
                         or verified then
@@ -873,7 +867,23 @@ function KeySystem:Start(options)
 
                     end
 
-                end
+
+    end
+
+
+    local VerifyButton
+
+
+    VerifyButton =
+        Section:CreateButton({
+
+            Name =
+                "🔐 Verifikasi Key",
+
+            ConfigIgnore = true,
+
+            Callback =
+                PerformVerify
 
         })
 
@@ -920,16 +930,9 @@ function KeySystem:Start(options)
         Verify =
             function()
 
-                if VerifyButton
-                    and VerifyButton.Activate then
+                PerformVerify()
 
-                    VerifyButton:Activate()
-
-                    return true
-
-                end
-
-                return false
+                return true
 
             end
 
@@ -939,3 +942,4 @@ end
 
 
 return KeySystem
+```
