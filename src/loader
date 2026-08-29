@@ -5,10 +5,10 @@
 local CONFIG = {
 
     UI_LIBRARY_URL =
-        "https://raw.githubusercontent.com/apezts/LIB-PHILANX/refs/heads/main/src/UILibrary.lua",
+        "https://pastebin.com/raw/6Fu9M0tv",
 
     KEY_SYSTEM_URL =
-        "https://raw.githubusercontent.com/apezts/LIB-PHILANX/refs/heads/main/src/keysystem",
+        "https://pastebin.com/VHKFp9fe",
 
     MAIN_SOURCE_URL =
         "https://raw.githubusercontent.com/apezts/Nezha/refs/heads/main/loader",
