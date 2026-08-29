@@ -728,7 +728,7 @@ end
 -- KEY SYSTEM UI
 --========================================================--
 
-local function StartKeyUI()
+local function StartKeyUI(autoKey)
 
     local gateOK,
         gateResult =
@@ -766,6 +766,23 @@ local function StartKeyUI()
                         SaveKey(
                             enteredKey
                         )
+
+
+                        -- Bersihkan redeemed key setelah verifikasi berhasil.
+                        pcall(function()
+
+                            if type(getgenv) == "function"
+                                and tostring(
+                                    getgenv().PHILANX_REDEEMED_KEY
+                                    or ""
+                                ) == tostring(enteredKey) then
+
+                                getgenv().PHILANX_REDEEMED_KEY =
+                                    nil
+
+                            end
+
+                        end)
 
 
                         Log(
@@ -829,6 +846,53 @@ local function StartKeyUI()
         )
 
         return false
+
+    end
+
+
+
+    --========================================================--
+    -- AUTO REDEEM KEY
+    --========================================================--
+    --
+    -- Redeemed key menggunakan jalur verifikasi normal:
+    -- isi TextBox secara otomatis lalu panggil Verify().
+    -- Jalur ini sengaja tidak memakai VerifySavedKey().
+    --
+    if autoKey
+        and type(gateResult) == "table" then
+
+        local input =
+            gateResult.Input
+
+        local verify =
+            gateResult.Verify
+
+        if input
+            and type(verify) == "function" then
+
+            pcall(function()
+
+                input.Text =
+                    tostring(autoKey)
+
+            end)
+
+            task.defer(function()
+
+                pcall(
+                    verify
+                )
+
+            end)
+
+        else
+
+            LogError(
+                "Auto redeem gagal: API Input/Verify tidak tersedia."
+            )
+
+        end
 
     end
 
@@ -1036,61 +1100,15 @@ if redeemedKey then
         "Redeemed key ditemukan."
     )
 
-
-    local valid,
-        result =
-        VerifySavedKey(
-            redeemedKey
-        )
-
-
-    if valid then
-
-        Log(
-            "Redeemed key masih valid."
-        )
-
-
-        SaveKey(
-            redeemedKey
-        )
-
-
-        ClearRedeemedKey()
-
-
-        Log(
-            "Melewati Key UI."
-        )
-
-
-        task.spawn(
-            StartMainSource
-        )
-
-
-        return
-
-    end
-
-
-    local reason =
-        type(result) == "table"
-        and (
-            result.reason
-            or result.error
-        )
-        or result
-        or "invalid"
-
-
-    LogError(
-        "Redeemed key tidak valid: " ..
-        tostring(reason)
+    Log(
+        "Membuka Key System untuk verifikasi otomatis..."
     )
 
+    StartKeyUI(
+        redeemedKey
+    )
 
-    ClearRedeemedKey()
+    return
 
 end
 
